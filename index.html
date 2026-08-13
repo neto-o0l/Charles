@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head><link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00adb5">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Professor de Estudos</title>
+  <title>Professor de Estudos - RPG</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00adb5">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -24,15 +25,45 @@
       border-radius: 20px;
       padding: 25px;
       width: 100%;
-      max-width: 350px;
+      max-width: 380px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
+    
+    /* Painel de Gamificação e Nível */
+    .user-stats {
+      background: #222226;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 15px;
+    }
+    .level-info {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+      color: #00adb5;
+    }
+    .progress-bar-bg {
+      background: #3e3e4a;
+      border-radius: 8px;
+      height: 10px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      background: #00adb5;
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
     .mascot-container {
-      height: 200px;
+      height: 180px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
     .mascot {
       max-height: 100%;
@@ -54,52 +85,121 @@
       background: #3e3e4a;
       border-radius: 12px;
       padding: 12px;
-      font-size: 0.95rem;
-      margin-bottom: 20px;
-      min-height: 60px;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+      min-height: 55px;
       display: flex;
       align-items: center;
       justify-content: center;
       line-height: 1.3;
     }
+
+    /* Seleção de Modos de Tempo */
+    .time-selector {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+    .time-btn {
+      background: #3e3e4a;
+      color: #fff;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .time-btn.active {
+      background: #00adb5;
+    }
+
     .timer {
       font-size: 2.8rem;
       font-weight: bold;
       color: #00adb5;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
+
+    /* Painel de Metas e Ciclos */
+    .counters-container {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 15px;
+      background: #222226;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
     .buttons {
       display: flex;
       gap: 10px;
       flex-direction: column;
     }
-    button {
+    button.main-btn {
       background: #00adb5;
       color: white;
       border: none;
-      padding: 14px;
+      padding: 12px;
       border-radius: 10px;
       font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
     }
+    button.pause { background: #f39c12; }
     button.cancel { background: #e63946; }
+    button.reset-btn {
+      background: transparent;
+      color: #888;
+      border: none;
+      font-size: 0.75rem;
+      margin-top: 10px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
 
   <div class="card">
+    <div class="user-stats">
+      <div class="level-info">
+        <span id="levelDisplay">Nível 1</span>
+        <span id="xpDisplay">0 / 100 XP</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div id="xpBar" class="progress-bar-fill"></div>
+      </div>
+    </div>
+
     <div class="mascot-container">
       <img id="mascot" class="mascot" src="Professor_neutro.png" alt="Professor">
     </div>
-    <div id="speech" class="speech-bubble">Estou de olho em você. Hora de começar os estudos?</div>
+    <div id="speech" class="speech-bubble">Estou de olho em você. Escolha o tempo e vamos começar!</div>
+
+    <div class="time-selector">
+      <button class="time-btn" onclick="selectTime(15, this)">15 min</button>
+      <button class="time-btn active" onclick="selectTime(25, this)">25 min</button>
+      <button class="time-btn" onclick="selectTime(50, this)">50 min</button>
+      <button class="time-btn" onclick="selectTime(5, this)">5 min (Pausa)</button>
+    </div>
+
     <div id="timer" class="timer">25:00</div>
 
-    <div class="buttons">
-      <button id="btnStart" onclick="startTimer()">Iniciar Estudos (25 min)</button>
-      <button id="btnFinish" onclick="finishTimer()" style="display: none;">Concluir Tarefa</button>
-      <button id="btnCancel" class="cancel" onclick="cancelTimer()" style="display: none;">Desistir / Cancelar</button>
+    <div class="counters-container">
+      <div>Sessões: <strong id="completedSessions">0</strong></div>
+      <div>Meta Hoje: <strong id="goalProgress">0%</strong></div>
     </div>
+
+    <div class="buttons">
+      <button id="btnStart" class="main-btn" onclick="startTimer()">Iniciar Estudos</button>
+      <button id="btnPause" class="main-btn pause" onclick="pauseTimer()" style="display: none;">Pausar</button>
+      <button id="btnFinish" class="main-btn" onclick="finishTimer()" style="display: none;">Concluir Tarefa</button>
+      <button id="btnCancel" class="main-btn cancel" onclick="cancelTimer()" style="display: none;">Desistir / Cancelar</button>
+    </div>
+
+    <button class="reset-btn" onclick="resetStats()">Resetar Progresso de Hoje</button>
   </div>
 
   <script>
@@ -110,19 +210,42 @@
       bravo: "Professor_bravo.png"
     };
 
-    // ADICIONADO: Áudios para os alertas e bronca (Substitua pelos seus arquivos .mp3 se tiver)
     const AUDIO_BRONCA = new Audio("https://assets.mixkit.co/active_storage/sfx/2874/2874-preview.mp3");
     const AUDIO_SUCESSO = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
 
+    // Variáveis de Estado (Salvas no localStorage)
+    let selectedMinutes = 25;
     let timeLeft = 25 * 60;
     let timerInterval = null;
+    let isPaused = false;
+
+    let userLevel = parseInt(localStorage.getItem("userLevel")) || 1;
+    let userXP = parseInt(localStorage.getItem("userXP")) || 0;
+    let sessionsDone = parseInt(localStorage.getItem("sessionsDone")) || 0;
+    const dailyGoal = 4; // Meta padrão de 4 sessões por dia
 
     const mascotImg = document.getElementById("mascot");
     const speechEl = document.getElementById("speech");
     const timerEl = document.getElementById("timer");
     const btnStart = document.getElementById("btnStart");
+    const btnPause = document.getElementById("btnPause");
     const btnFinish = document.getElementById("btnFinish");
     const btnCancel = document.getElementById("btnCancel");
+
+    // Inicialização
+    updateDisplay();
+    updateGamificationUI();
+
+    function selectTime(minutes, element) {
+      if (timerInterval) return; // Não troca tempo durante a execução
+      selectedMinutes = minutes;
+      timeLeft = minutes * 60;
+      
+      document.querySelectorAll(".time-btn").forEach(btn => btn.classList.remove("active"));
+      element.classList.add("active");
+      
+      updateDisplay();
+    }
 
     function updateDisplay() {
       const minutes = Math.floor(timeLeft / 60);
@@ -141,47 +264,118 @@
     }
 
     function startTimer() {
-      setMascotState("estudando", "Foco total agora! Sem distrações nem redes sociais.");
+      if (isPaused) {
+        isPaused = false;
+        btnPause.textContent = "Pausar";
+        setMascotState("estudando", "Voltando ao foco! Mantenha a concentração.");
+      } else {
+        setMascotState("estudando", "Foco total agora! Sem distrações nem redes sociais.");
+      }
+
       btnStart.style.display = "none";
+      btnPause.style.display = "block";
       btnFinish.style.display = "block";
       btnCancel.style.display = "block";
 
       timerInterval = setInterval(() => {
-        timeLeft--;
-        updateDisplay();
+        if (!isPaused) {
+          timeLeft--;
+          updateDisplay();
 
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          finishTimer();
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            finishTimer();
+          }
         }
       }, 1000);
     }
 
+    function pauseTimer() {
+      if (!isPaused) {
+        isPaused = true;
+        btnPause.textContent = "Retomar";
+        setMascotState("neutro", "Pausado? Espero que seja uma emergência real!");
+      } else {
+        startTimer();
+      }
+    }
+
     function finishTimer() {
       clearInterval(timerInterval);
-      AUDIO_SUCESSO.play(); // Toca som de vitória
+      timerInterval = null;
+      AUDIO_SUCESSO.play();
       setMascotState("feliz", "Muito bem! Você cumpriu sua meta. Tenho orgulho da sua dedicação!");
+      
+      sessionsDone++;
+      addXP(selectedMinutes * 2); // 1 min de estudo = 2 XP
+      
+      saveStats();
       resetButtons();
     }
 
     function cancelTimer() {
       clearInterval(timerInterval);
-      AUDIO_BRONCA.play(); // Toca o som da bronca
+      timerInterval = null;
+      isPaused = false;
+      AUDIO_BRONCA.play();
       setMascotState("bravo", "COMO ASSIM DESISTIU?! Não aceito falta de comprometimento! Volte já ao trabalho!", true);
       resetButtons();
     }
 
     function resetButtons() {
       btnStart.style.display = "block";
+      btnPause.style.display = "none";
+      btnPause.textContent = "Pausar";
       btnFinish.style.display = "none";
       btnCancel.style.display = "none";
-      timeLeft = 25 * 60;
+      timeLeft = selectedMinutes * 60;
       updateDisplay();
     }
+
+    // Lógica de RPG / Sistema de Nível
+    function addXP(amount) {
+      userXP += amount;
+      const xpNeeded = userLevel * 100;
+
+      if (userXP >= xpNeeded) {
+        userXP -= xpNeeded;
+        userLevel++;
+        alert(`🎉 PARABÉNS! Você subiu para o Nível ${userLevel}!`);
+      }
+      updateGamificationUI();
+    }
+
+    function updateGamificationUI() {
+      const xpNeeded = userLevel * 100;
+      document.getElementById("levelDisplay").textContent = `Nível ${userLevel}`;
+      document.getElementById("xpDisplay").textContent = `${userXP} / ${xpNeeded} XP`;
+      
+      const xpPercent = Math.min((userXP / xpNeeded) * 100, 100);
+      document.getElementById("xpBar").style.width = `${xpPercent}%`;
+
+      document.getElementById("completedSessions").textContent = sessionsDone;
+      const goalPercent = Math.min(Math.round((sessionsDone / dailyGoal) * 100), 100);
+      document.getElementById("goalProgress").textContent = `${goalPercent}%`;
+    }
+
+    function saveStats() {
+      localStorage.setItem("userLevel", userLevel);
+      localStorage.setItem("userXP", userXP);
+      localStorage.setItem("sessionsDone", sessionsDone);
+    }
+
+    function resetStats() {
+      if (confirm("Deseja realmente zerar o contador de sessões e o progresso de hoje?")) {
+        sessionsDone = 0;
+        saveStats();
+        updateGamificationUI();
+      }
+    }
+
+    // Registro do ServiceWorker
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js");
+    }
   </script>
-</body><script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js");
-  }
-</script>
+</body>
 </html>
