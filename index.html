@@ -38,7 +38,6 @@
       max-width: 100%;
       transition: transform 0.2s ease;
     }
-    /* Efeito visual quando o professor fica bravo */
     .shake {
       animation: shake 0.4s infinite;
     }
@@ -103,7 +102,6 @@
   </div>
 
   <script>
-    // Nomes exatos dos arquivos de imagem que você deve criar:
     const SPRITES = {
       neutro: "Professor_neutro.png",
       estudando: "Professor_estudando.png",
@@ -111,7 +109,11 @@
       bravo: "Professor_bravo.png"
     };
 
-    let timeLeft = 25 * 60; // 25 minutos em segundos
+    // ADICIONADO: Áudios para os alertas e bronca (Substitua pelos seus arquivos .mp3 se tiver)
+    const AUDIO_BRONCA = new Audio("https://assets.mixkit.co/active_storage/sfx/2874/2874-preview.mp3");
+    const AUDIO_SUCESSO = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
+
+    let timeLeft = 25 * 60;
     let timerInterval = null;
 
     const mascotImg = document.getElementById("mascot");
@@ -156,12 +158,14 @@
 
     function finishTimer() {
       clearInterval(timerInterval);
+      AUDIO_SUCESSO.play(); // Toca som de vitória
       setMascotState("feliz", "Muito bem! Você cumpriu sua meta. Tenho orgulho da sua dedicação!");
       resetButtons();
     }
 
     function cancelTimer() {
       clearInterval(timerInterval);
+      AUDIO_BRONCA.play(); // Toca o som da bronca
       setMascotState("bravo", "COMO ASSIM DESISTIU?! Não aceito falta de comprometimento! Volte já ao trabalho!", true);
       resetButtons();
     }
