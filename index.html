@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
+<head><link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00adb5">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Professor de Estudos</title>
@@ -178,5 +179,9 @@
       updateDisplay();
     }
   </script>
-</body>
+</body><script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js");
+  }
+</script>
 </html>
