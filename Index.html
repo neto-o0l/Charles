@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Professor de Estudos</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #1a1a1d;
+      color: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+    .card {
+      background: #2d2d34;
+      border-radius: 20px;
+      padding: 25px;
+      width: 100%;
+      max-width: 350px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .mascot-container {
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+    .mascot {
+      max-height: 100%;
+      max-width: 100%;
+      transition: transform 0.2s ease;
+    }
+    /* Efeito visual quando o professor fica bravo */
+    .shake {
+      animation: shake 0.4s infinite;
+    }
+    @keyframes shake {
+      0% { transform: translate(2px, 2px) rotate(0deg); }
+      20% { transform: translate(-3px, 0px) rotate(-2deg); }
+      40% { transform: translate(3px, 2px) rotate(2deg); }
+      60% { transform: translate(-3px, 1px) rotate(0deg); }
+      80% { transform: translate(3px, 1px) rotate(-2deg); }
+      100% { transform: translate(1px, -2px) rotate(0deg); }
+    }
+    .speech-bubble {
+      background: #3e3e4a;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.3;
+    }
+    .timer {
+      font-size: 2.8rem;
+      font-weight: bold;
+      color: #00adb5;
+      margin-bottom: 20px;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+    }
+    button {
+      background: #00adb5;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button.cancel { background: #e63946; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="mascot-container">
+      <img id="mascot" class="mascot" src="professor_neutro.png" alt="Professor">
+    </div>
+    <div id="speech" class="speech-bubble">Estou de olho em você. Hora de começar os estudos?</div>
+    <div id="timer" class="timer">25:00</div>
+
+    <div class="buttons">
+      <button id="btnStart" onclick="startTimer()">Iniciar Estudos (25 min)</button>
+      <button id="btnFinish" onclick="finishTimer()" style="display: none;">Concluir Tarefa</button>
+      <button id="btnCancel" class="cancel" onclick="cancelTimer()" style="display: none;">Desistir / Cancelar</button>
+    </div>
+  </div>
+
+  <script>
+    // Nomes exatos dos arquivos de imagem que você deve criar:
+    const SPRITES = {
+      neutro: "professor_neutro.png",
+      estudando: "professor_estudando.png",
+      feliz: "professor_feliz.png",
+      bravo: "professor_bravo.png"
+    };
+
+    let timeLeft = 25 * 60; // 25 minutos em segundos
+    let timerInterval = null;
+
+    const mascotImg = document.getElementById("mascot");
+    const speechEl = document.getElementById("speech");
+    const timerEl = document.getElementById("timer");
+    const btnStart = document.getElementById("btnStart");
+    const btnFinish = document.getElementById("btnFinish");
+    const btnCancel = document.getElementById("btnCancel");
+
+    function updateDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function setMascotState(state, message, isAngry = false) {
+      mascotImg.src = SPRITES[state];
+      speechEl.textContent = message;
+      if (isAngry) {
+        mascotImg.classList.add("shake");
+      } else {
+        mascotImg.classList.remove("shake");
+      }
+    }
+
+    function startTimer() {
+      setMascotState("estudando", "Foco total agora! Sem distrações nem redes sociais.");
+      btnStart.style.display = "none";
+      btnFinish.style.display = "block";
+      btnCancel.style.display = "block";
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateDisplay();
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          finishTimer();
+        }
+      }, 1000);
+    }
+
+    function finishTimer() {
+      clearInterval(timerInterval);
+      setMascotState("feliz", "Muito bem! Você cumpriu sua meta. Tenho orgulho da sua dedicação!");
+      resetButtons();
+    }
+
+    function cancelTimer() {
+      clearInterval(timerInterval);
+      setMascotState("bravo", "COMO ASSIM DESISTIU?! Não aceito falta de comprometimento! Volte já ao trabalho!", true);
+      resetButtons();
+    }
+
+    function resetButtons() {
+      btnStart.style.display = "block";
+      btnFinish.style.display = "none";
+      btnCancel.style.display = "none";
+      timeLeft = 25 * 60;
+      updateDisplay();
+    }
+  </script>
+</body>
+</html>
