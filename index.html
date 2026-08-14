@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Professor de Estudos - Fase 3</title>
+  <title>Professor de Estudos - Fase Final RPG</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#00adb5">
   <style>
@@ -37,7 +37,6 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
 
-    /* Topo: Streak e Nível */
     .header-stats {
       display: flex;
       justify-content: space-between;
@@ -49,7 +48,7 @@
       font-size: 0.85rem;
       font-weight: bold;
     }
-    .streak-badge { color: #ff9f43; display: flex; align-items: center; gap: 4px; }
+    .streak-badge { color: #ff9f43; }
     .level-badge { color: #00adb5; }
 
     .progress-bar-bg {
@@ -70,7 +69,7 @@
       justify-content: center;
       margin-bottom: 8px;
     }
-    .mascot { max-height: 100%; max-width: 100%; border-radius: 10px; }
+    .mascot { max-height: 100%; max-width: 100%; border-radius: 10px; object-fit: contain; }
     .shake { animation: shake 0.4s infinite; }
     @keyframes shake {
       0% { transform: translate(2px, 2px) rotate(0deg); }
@@ -100,7 +99,6 @@
     .time-btn { background: #3e3e4a; color: #fff; border: none; padding: 6px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
     .time-btn.active { background: #00adb5; }
 
-    /* Módulos da Fase 3: Lista de Assuntos & Simulados */
     .box-section {
       background: #222226;
       border-radius: 10px;
@@ -110,7 +108,22 @@
       font-size: 0.8rem;
     }
     .box-title { font-weight: bold; color: #00adb5; margin-bottom: 6px; display: flex; justify-content: space-between; }
-    
+
+    /* Estatísticas de Tempo */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .stat-card {
+      background: #2d2d34;
+      padding: 6px;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .stat-card strong { color: #00adb5; display: block; font-size: 0.9rem; }
+
     .input-group { display: flex; gap: 6px; margin-bottom: 6px; }
     input[type="text"], input[type="date"] {
       flex: 1;
@@ -123,7 +136,7 @@
     }
     .add-btn { background: #00adb5; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-    ul.item-list { list-style: none; max-height: 90px; overflow-y: auto; }
+    ul.item-list { list-style: none; max-height: 80px; overflow-y: auto; }
     ul.item-list li {
       display: flex;
       justify-content: space-between;
@@ -139,7 +152,7 @@
     button.main-btn { background: #00adb5; color: white; border: none; padding: 10px; border-radius: 10px; font-size: 0.95rem; font-weight: bold; cursor: pointer; }
     button.pause { background: #f39c12; }
     button.cancel { background: #e63946; }
-    
+
     .custom-row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.75rem; }
     select { background: #3e3e4a; color: #fff; border: none; padding: 4px 6px; border-radius: 6px; }
   </style>
@@ -162,7 +175,7 @@
     <div class="mascot-container">
       <img id="mascot" class="mascot" src="Professor_neutro.png" alt="Mascote">
     </div>
-    <div id="speech" class="speech-bubble">O que vamos estudar hoje? Organize suas matérias abaixo!</div>
+    <div id="speech" class="speech-bubble">Seus rivais estão estudando. Qual será o seu próximo movimento?</div>
 
     <div class="time-selector">
       <button class="time-btn" onclick="selectTime(15, this)">15m</button>
@@ -173,8 +186,30 @@
 
     <div id="timer" class="timer">25:00</div>
 
+    <div class="buttons" style="margin-bottom: 10px;">
+      <button id="btnStart" class="main-btn" onclick="startTimer()">Iniciar Estudos</button>
+      <button id="btnPause" class="main-btn pause" onclick="pauseTimer()" style="display: none;">Pausar</button>
+      <button id="btnFinish" class="main-btn" onclick="finishTimer()" style="display: none;">Concluir Tarefa</button>
+      <button id="btnCancel" class="main-btn cancel" onclick="cancelTimer()" style="display: none;">Desistir / Cancelar</button>
+    </div>
+
     <div class="box-section">
-      <div class="box-title">📚 O que estudar hoje:</div>
+      <div class="box-title">🏆 Ranking de Rivais (XP Total):</div>
+      <ul id="rivalsList" class="item-list"></ul>
+    </div>
+
+    <div class="box-section">
+      <div class="box-title">📊 Tempo Estudado:</div>
+      <div class="stats-grid">
+        <div class="stat-card">Hoje: <strong id="timeDay">0h 0m</strong></div>
+        <div class="stat-card">Semana: <strong id="timeWeek">0h 0m</strong></div>
+        <div class="stat-card">Mês: <strong id="timeMonth">0h 0m</strong></div>
+        <div class="stat-card">Ano: <strong id="timeYear">0h 0m</strong></div>
+      </div>
+    </div>
+
+    <div class="box-section">
+      <div class="box-title">📚 Assuntos de Hoje:</div>
       <div class="input-group">
         <input type="text" id="subjectInput" placeholder="Ex: Matemática - Geometria">
         <button class="add-btn" onclick="addSubject()">+</button>
@@ -185,20 +220,22 @@
     <div class="box-section">
       <div class="box-title">🎯 Próximo Simulado:</div>
       <div class="input-group">
-        <input type="text" id="simTitle" placeholder="Ex: ENEM / Vestibular">
+        <input type="text" id="simTitle" placeholder="Ex: ENEM">
         <input type="date" id="simDate">
         <button class="add-btn" onclick="addSimulado()">+</button>
       </div>
       <ul id="simList" class="item-list"></ul>
     </div>
 
-    <div class="buttons">
-      <button id="btnStart" class="main-btn" onclick="startTimer()">Iniciar Estudos</button>
-      <button id="btnPause" class="main-btn pause" onclick="pauseTimer()" style="display: none;">Pausar</button>
-      <button id="btnFinish" class="main-btn" onclick="finishTimer()" style="display: none;">Concluir Tarefa</button>
-      <button id="btnCancel" class="main-btn cancel" onclick="cancelTimer()" style="display: none;">Desistir / Cancelar</button>
+    <div class="custom-row">
+      <label>🎭 Avatar:</label>
+      <select id="selectAvatar" onchange="changeAvatar(this.value)">
+        <option value="Professor_neutro.png">Padrão</option>
+        <option value="Professor_estudando.png">Modo Foco</option>
+        <option value="Professor_feliz.png">Modo Feliz</option>
+        <option value="Professor_bravo.png">Modo Bravo</option>
+      </select>
     </div>
-
     <div class="custom-row">
       <label>🎨 Cenário:</label>
       <select id="selectTheme" onchange="changeTheme(this.value)">
@@ -211,13 +248,6 @@
   </div>
 
   <script>
-    const SPRITES = {
-      neutro: "Professor_neutro.png",
-      estudando: "Professor_estudando.png",
-      feliz: "Professor_feliz.png",
-      bravo: "Professor_bravo.png"
-    };
-
     const AUDIO_BRONCA = new Audio("https://assets.mixkit.co/active_storage/sfx/2874/2874-preview.mp3");
     const AUDIO_SUCESSO = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
 
@@ -228,12 +258,21 @@
 
     let userLevel = parseInt(localStorage.getItem("userLevel")) || 1;
     let userXP = parseInt(localStorage.getItem("userXP")) || 0;
+    let totalMinutesStudied = parseInt(localStorage.getItem("totalMinutesStudied")) || 0;
     let stressLevel = parseInt(localStorage.getItem("stressLevel")) || 0;
     let streakCount = parseInt(localStorage.getItem("streakCount")) || 0;
     let lastStudyDate = localStorage.getItem("lastStudyDate") || "";
+    let currentAvatar = localStorage.getItem("currentAvatar") || "Professor_neutro.png";
 
     let subjects = JSON.parse(localStorage.getItem("subjects")) || [];
     let simulados = JSON.parse(localStorage.getItem("simulados")) || [];
+
+    // Rivais Dinâmicos
+    let rivals = JSON.parse(localStorage.getItem("rivals")) || [
+      { name: "Rin", xp: 1200 },
+      { name: "Barou", xp: 800 },
+      { name: "Nagi", xp: 450 }
+    ];
 
     const mascotImg = document.getElementById("mascot");
     const speechEl = document.getElementById("speech");
@@ -244,9 +283,13 @@
     const btnCancel = document.getElementById("btnCancel");
 
     // Inicialização
+    mascotImg.src = currentAvatar;
+    document.getElementById("selectAvatar").value = currentAvatar;
     checkStreak();
     renderSubjects();
     renderSimulados();
+    renderRivals();
+    updateTimeStats();
     updateGamificationUI();
 
     function selectTime(minutes, element) {
@@ -264,20 +307,26 @@
       timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
-    function setMascotState(state, message, isAngry = false) {
-      mascotImg.src = SPRITES[state];
+    function setMascotState(stateImg, message, isAngry = false) {
+      mascotImg.src = stateImg;
       speechEl.textContent = message;
       if (isAngry || stressLevel >= 75) mascotImg.classList.add("shake");
       else mascotImg.classList.remove("shake");
+    }
+
+    function changeAvatar(avatarSrc) {
+      currentAvatar = avatarSrc;
+      mascotImg.src = avatarSrc;
+      localStorage.setItem("currentAvatar", avatarSrc);
     }
 
     function startTimer() {
       if (isPaused) {
         isPaused = false;
         btnPause.textContent = "Pausar";
-        setMascotState("estudando", "Voltando ao foco!");
+        setMascotState("Professor_estudando.png", "Voltando ao trabalho!");
       } else {
-        setMascotState("estudando", "Concentração total no assunto escolhido!");
+        setMascotState("Professor_estudando.png", "Foco total na missão!");
       }
 
       btnStart.style.display = "none";
@@ -302,7 +351,7 @@
         isPaused = true;
         btnPause.textContent = "Retomar";
         addStress(15);
-        setMascotState("neutro", "Pausou? O tempo continua passando...");
+        setMascotState(currentAvatar, "Pausou? Seus rivais continuam estudando!");
       } else {
         startTimer();
       }
@@ -314,10 +363,12 @@
       AUDIO_SUCESSO.play();
       reduceStress(25);
       
+      totalMinutesStudied += selectedMinutes;
       updateStreakOnCompletion();
       addXP(selectedMinutes * 2);
+      updateRivals();
       
-      setMascotState("feliz", "Excelente bloco de estudos! Foco mantido!");
+      setMascotState("Professor_feliz.png", "Excelente! Você superou seus limites hoje!");
       resetButtons();
     }
 
@@ -327,20 +378,57 @@
       isPaused = false;
       AUDIO_BRONCA.play();
       addStress(40);
-      setMascotState("bravo", "DESISTIU?! Assim a aprovação não vem!", true);
+      setMascotState("Professor_bravo.png", "DESISTIU?! Assim os rivais vão te ultrapassar!", true);
       resetButtons();
     }
 
-    // Lógica do Streak (Sequência de dias)
+    // Sistema de Rivais Inteligentes
+    function updateRivals() {
+      // Quando o jogador estuda, os rivais também progridem um pouco para manter a competição!
+      rivals.forEach(r => {
+        r.xp += Math.floor(Math.random() * (selectedMinutes * 1.5));
+      });
+      renderRivals();
+    }
+
+    function renderRivals() {
+      const userTotalXP = (userLevel - 1) * 100 + userXP;
+      let rankingList = [...rivals, { name: "Você 🫵", xp: userTotalXP }];
+      rankingList.sort((a, b) => b.xp - a.xp);
+
+      const list = document.getElementById("rivalsList");
+      list.innerHTML = "";
+      rankingList.forEach((r, index) => {
+        const isUser = r.name.includes("Você");
+        list.innerHTML += `<li style="${isUser ? 'color: #00adb5; font-weight: bold;' : ''}">
+          <span>#${index + 1} ${r.name}</span>
+          <span>${r.xp} XP</span>
+        </li>`;
+      });
+      localStorage.setItem("rivals", JSON.stringify(rivals));
+    }
+
+    // Estatísticas de Tempo
+    function updateTimeStats() {
+      const hrs = Math.floor(totalMinutesStudied / 60);
+      const mins = totalMinutesStudied % 60;
+      
+      document.getElementById("timeDay").textContent = `${hrs}h ${mins}m`;
+      document.getElementById("timeWeek").textContent = `${hrs}h ${mins}m`;
+      document.getElementById("timeMonth").textContent = `${hrs}h ${mins}m`;
+      document.getElementById("timeYear").textContent = `${hrs}h ${mins}m`;
+
+      localStorage.setItem("totalMinutesStudied", totalMinutesStudied);
+    }
+
+    // Streak
     function checkStreak() {
       const today = new Date().toDateString();
       if (lastStudyDate) {
         const lastDate = new Date(lastStudyDate);
-        const diffTime = Math.abs(new Date(today) - lastDate);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
+        const diffDays = Math.ceil(Math.abs(new Date(today) - lastDate) / (1000 * 60 * 60 * 24));
         if (diffDays > 1) {
-          streakCount = 0; // Perdeu a sequência
+          streakCount = 0;
           localStorage.setItem("streakCount", 0);
         }
       }
@@ -358,7 +446,7 @@
       document.getElementById("streakCount").textContent = streakCount;
     }
 
-    // Assuntos / Matérias
+    // Assuntos e Simulados
     function addSubject() {
       const input = document.getElementById("subjectInput");
       if (!input.value.trim()) return;
@@ -385,7 +473,6 @@
       });
     }
 
-    // Simulados
     function addSimulado() {
       const title = document.getElementById("simTitle").value;
       const date = document.getElementById("simDate").value;
@@ -410,12 +497,9 @@
       const list = document.getElementById("simList");
       list.innerHTML = "";
       simulados.forEach(s => {
-        const today = new Date();
-        const simDate = new Date(s.date);
-        const diffDays = Math.ceil((simDate - today) / (1000 * 60 * 60 * 24));
-        const daysText = diffDays >= 0 ? `Faltam ${diffDays} dias` : "Já passou";
-        
-        list.innerHTML += `<li>${s.title} (${daysText}) <span class="remove-item" onclick="removeSimulado(${s.id})">✕</span></li>`;
+        const diffDays = Math.ceil((new Date(s.date) - new Date()) / (1000 * 60 * 60 * 24));
+        const text = diffDays >= 0 ? `Faltam ${diffDays}d` : "Concluído";
+        list.innerHTML += `<li>${s.title} (${text}) <span class="remove-item" onclick="removeSimulado(${s.id})">✕</span></li>`;
       });
     }
 
@@ -446,6 +530,8 @@
       document.getElementById("xpBar").style.width = `${Math.min((userXP / xpNeeded) * 100, 100)}%`;
       document.getElementById("stressDisplay").textContent = `${stressLevel}%`;
       document.getElementById("stressBar").style.width = `${stressLevel}%`;
+
+      updateTimeStats();
 
       localStorage.setItem("userLevel", userLevel);
       localStorage.setItem("userXP", userXP);
