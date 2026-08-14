@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Professor de Estudos - RPG</title>
+  <title>Professor de Estudos - Fase 2</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#00adb5">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
       background-color: #1a1a1d;
       color: #ffffff;
@@ -19,37 +20,46 @@
       min-height: 100vh;
       padding: 20px;
       text-align: center;
+      transition: background-color 0.4s ease;
     }
+
+    /* Temas / Cenários de Fundo */
+    body.theme-dark { background-color: #1a1a1d; }
+    body.theme-dojo { background-color: #2b1e1e; }
+    body.theme-cyber { background-color: #0f1026; }
+    body.theme-nature { background-color: #1b261c; }
+
     .card {
       background: #2d2d34;
       border-radius: 20px;
-      padding: 25px;
+      padding: 20px;
       width: 100%;
       max-width: 380px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
     
-    /* Painel de Gamificação e Nível */
+    /* Painel de Nível e XP */
     .user-stats {
       background: #222226;
       border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 15px;
+      padding: 10px;
+      margin-bottom: 12px;
     }
-    .level-info {
+    .stat-info {
       display: flex;
       justify-content: space-between;
       font-weight: bold;
-      margin-bottom: 5px;
-      font-size: 0.9rem;
+      margin-bottom: 4px;
+      font-size: 0.85rem;
       color: #00adb5;
     }
     .progress-bar-bg {
       background: #3e3e4a;
       border-radius: 8px;
-      height: 10px;
+      height: 8px;
       width: 100%;
       overflow: hidden;
+      margin-bottom: 8px;
     }
     .progress-bar-fill {
       background: #00adb5;
@@ -58,8 +68,13 @@
       transition: width 0.3s ease;
     }
 
+    /* Barra de Estresse do Professor */
+    .stress-fill {
+      background: #e63946 !important;
+    }
+
     .mascot-container {
-      height: 180px;
+      height: 170px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -68,6 +83,7 @@
     .mascot {
       max-height: 100%;
       max-width: 100%;
+      border-radius: 10px;
       transition: transform 0.2s ease;
     }
     .shake {
@@ -81,33 +97,34 @@
       80% { transform: translate(3px, 1px) rotate(-2deg); }
       100% { transform: translate(1px, -2px) rotate(0deg); }
     }
+
     .speech-bubble {
       background: #3e3e4a;
       border-radius: 12px;
-      padding: 12px;
-      font-size: 0.9rem;
-      margin-bottom: 15px;
-      min-height: 55px;
+      padding: 10px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      min-height: 50px;
       display: flex;
       align-items: center;
       justify-content: center;
       line-height: 1.3;
     }
 
-    /* Seleção de Modos de Tempo */
+    /* Modos de Tempo */
     .time-selector {
       display: flex;
       gap: 6px;
       justify-content: center;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
     .time-btn {
       background: #3e3e4a;
       color: #fff;
       border: none;
-      padding: 6px 10px;
+      padding: 6px 8px;
       border-radius: 6px;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       cursor: pointer;
     }
     .time-btn.active {
@@ -115,26 +132,50 @@
     }
 
     .timer {
-      font-size: 2.8rem;
+      font-size: 2.5rem;
       font-weight: bold;
       color: #00adb5;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
-    /* Painel de Metas e Ciclos */
     .counters-container {
       display: flex;
       justify-content: space-between;
-      font-size: 0.85rem;
-      margin-bottom: 15px;
+      font-size: 0.8rem;
+      margin-bottom: 12px;
       background: #222226;
-      padding: 10px;
+      padding: 8px 12px;
       border-radius: 10px;
+    }
+
+    /* Customizações (Cenário e Avatar) */
+    .custom-panel {
+      background: #222226;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 12px;
+      font-size: 0.8rem;
+    }
+    .custom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .custom-row:last-child { margin-bottom: 0; }
+
+    select {
+      background: #3e3e4a;
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
     }
 
     .buttons {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-direction: column;
     }
     button.main-btn {
@@ -143,7 +184,7 @@
       border: none;
       padding: 12px;
       border-radius: 10px;
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: bold;
       cursor: pointer;
     }
@@ -154,29 +195,56 @@
       color: #888;
       border: none;
       font-size: 0.75rem;
-      margin-top: 10px;
+      margin-top: 8px;
       cursor: pointer;
       text-decoration: underline;
     }
   </style>
 </head>
-<body>
+<body id="bgBody" class="theme-dark">
 
   <div class="card">
     <div class="user-stats">
-      <div class="level-info">
+      <div class="stat-info">
         <span id="levelDisplay">Nível 1</span>
         <span id="xpDisplay">0 / 100 XP</span>
       </div>
       <div class="progress-bar-bg">
         <div id="xpBar" class="progress-bar-fill"></div>
       </div>
+
+      <div class="stat-info" style="color: #e63946; margin-top: 4px;">
+        <span>Estresse do Professor</span>
+        <span id="stressDisplay">0%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div id="stressBar" class="progress-bar-fill stress-fill"></div>
+      </div>
     </div>
 
     <div class="mascot-container">
-      <img id="mascot" class="mascot" src="Professor_neutro.png" alt="Professor">
+      <img id="mascot" class="mascot" src="Professor_neutro.png" alt="Mascote">
     </div>
-    <div id="speech" class="speech-bubble">Estou de olho em você. Escolha o tempo e vamos começar!</div>
+    <div id="speech" class="speech-bubble">Estou de olho em você. Vamos começar?</div>
+
+    <div class="custom-panel">
+      <div class="custom-row">
+        <label>🎨 Cenário:</label>
+        <select id="selectTheme" onchange="changeTheme(this.value)">
+          <option value="theme-dark">Padrão Escuro</option>
+          <option value="theme-dojo">Dojo Vermelho</option>
+          <option value="theme-cyber">Cyberpunk</option>
+          <option value="theme-nature">Florestal</option>
+        </select>
+      </div>
+      <div class="custom-row">
+        <label>🎭 Estilo:</label>
+        <select id="selectAvatar" onchange="changeAvatarStyle(this.value)">
+          <option value="default">Professor Padrão</option>
+          <option value="anime">Professor Anime</option>
+        </select>
+      </div>
+    </div>
 
     <div class="time-selector">
       <button class="time-btn" onclick="selectTime(15, this)">15 min</button>
@@ -203,17 +271,28 @@
   </div>
 
   <script>
-    const SPRITES = {
-      neutro: "Professor_neutro.png",
-      estudando: "Professor_estudando.png",
-      feliz: "Professor_feliz.png",
-      bravo: "Professor_bravo.png"
+    // Sprites por estilo de avatar
+    const AVATAR_SETS = {
+      default: {
+        neutro: "Professor_neutro.png",
+        estudando: "Professor_estudando.png",
+        feliz: "Professor_feliz.png",
+        bravo: "Professor_bravo.png"
+      },
+      anime: {
+        neutro: "Professor_neutro.png", // Usa suas imagens enviadas
+        estudando: "Professor_estudando.png",
+        feliz: "Professor_feliz.png",
+        bravo: "Professor_bravo.png"
+      }
     };
+
+    let currentAvatarSet = "default";
 
     const AUDIO_BRONCA = new Audio("https://assets.mixkit.co/active_storage/sfx/2874/2874-preview.mp3");
     const AUDIO_SUCESSO = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
 
-    // Variáveis de Estado (Salvas no localStorage)
+    // Estado Geral (Salvo no localStorage)
     let selectedMinutes = 25;
     let timeLeft = 25 * 60;
     let timerInterval = null;
@@ -222,7 +301,8 @@
     let userLevel = parseInt(localStorage.getItem("userLevel")) || 1;
     let userXP = parseInt(localStorage.getItem("userXP")) || 0;
     let sessionsDone = parseInt(localStorage.getItem("sessionsDone")) || 0;
-    const dailyGoal = 4; // Meta padrão de 4 sessões por dia
+    let stressLevel = parseInt(localStorage.getItem("stressLevel")) || 0; // Estresse de 0 a 100
+    const dailyGoal = 4;
 
     const mascotImg = document.getElementById("mascot");
     const speechEl = document.getElementById("speech");
@@ -232,12 +312,16 @@
     const btnFinish = document.getElementById("btnFinish");
     const btnCancel = document.getElementById("btnCancel");
 
-    // Inicialização
+    // Inicializar
+    const savedTheme = localStorage.getItem("selectedTheme") || "theme-dark";
+    changeTheme(savedTheme);
+    document.getElementById("selectTheme").value = savedTheme;
+
     updateDisplay();
     updateGamificationUI();
 
     function selectTime(minutes, element) {
-      if (timerInterval) return; // Não troca tempo durante a execução
+      if (timerInterval) return;
       selectedMinutes = minutes;
       timeLeft = minutes * 60;
       
@@ -254,22 +338,32 @@
     }
 
     function setMascotState(state, message, isAngry = false) {
-      mascotImg.src = SPRITES[state];
+      mascotImg.src = AVATAR_SETS[currentAvatarSet][state];
       speechEl.textContent = message;
-      if (isAngry) {
+      if (isAngry || stressLevel >= 75) {
         mascotImg.classList.add("shake");
       } else {
         mascotImg.classList.remove("shake");
       }
     }
 
+    function changeTheme(themeClass) {
+      document.body.className = themeClass;
+      localStorage.setItem("selectedTheme", themeClass);
+    }
+
+    function changeAvatarStyle(style) {
+      currentAvatarSet = style;
+      setMascotState("neutro", "Estilo alterado! Preparado para o foco?");
+    }
+
     function startTimer() {
       if (isPaused) {
         isPaused = false;
         btnPause.textContent = "Pausar";
-        setMascotState("estudando", "Voltando ao foco! Mantenha a concentração.");
+        setMascotState("estudando", "Voltando ao trabalho!");
       } else {
-        setMascotState("estudando", "Foco total agora! Sem distrações nem redes sociais.");
+        setMascotState("estudando", "Foco total agora! Sem distrações.");
       }
 
       btnStart.style.display = "none";
@@ -294,7 +388,8 @@
       if (!isPaused) {
         isPaused = true;
         btnPause.textContent = "Retomar";
-        setMascotState("neutro", "Pausado? Espero que seja uma emergência real!");
+        addStress(15); // Pausar aumenta o estresse em 15%
+        setMascotState("neutro", "Pausou?! Espero que seja urgente... O tempo corre!");
       } else {
         startTimer();
       }
@@ -304,10 +399,14 @@
       clearInterval(timerInterval);
       timerInterval = null;
       AUDIO_SUCESSO.play();
-      setMascotState("feliz", "Muito bem! Você cumpriu sua meta. Tenho orgulho da sua dedicação!");
+      
+      // Concluir reduz o estresse
+      reduceStress(25);
+      
+      setMascotState("feliz", "Excelente trabalho! É assim que se atinge metas!");
       
       sessionsDone++;
-      addXP(selectedMinutes * 2); // 1 min de estudo = 2 XP
+      addXP(selectedMinutes * 2);
       
       saveStats();
       resetButtons();
@@ -318,8 +417,24 @@
       timerInterval = null;
       isPaused = false;
       AUDIO_BRONCA.play();
-      setMascotState("bravo", "COMO ASSIM DESISTIU?! Não aceito falta de comprometimento! Volte já ao trabalho!", true);
+      
+      // Cancelar aumenta MUITO o estresse
+      addStress(40);
+      
+      setMascotState("bravo", "DESISTIU?! Inadmissível! Meu nível de estresse aumentou!", true);
       resetButtons();
+    }
+
+    function addStress(amount) {
+      stressLevel = Math.min(stressLevel + amount, 100);
+      updateGamificationUI();
+      saveStats();
+    }
+
+    function reduceStress(amount) {
+      stressLevel = Math.max(stressLevel - amount, 0);
+      updateGamificationUI();
+      saveStats();
     }
 
     function resetButtons() {
@@ -332,7 +447,6 @@
       updateDisplay();
     }
 
-    // Lógica de RPG / Sistema de Nível
     function addXP(amount) {
       userXP += amount;
       const xpNeeded = userLevel * 100;
@@ -353,6 +467,10 @@
       const xpPercent = Math.min((userXP / xpNeeded) * 100, 100);
       document.getElementById("xpBar").style.width = `${xpPercent}%`;
 
+      // Barra de Estresse
+      document.getElementById("stressDisplay").textContent = `${stressLevel}%`;
+      document.getElementById("stressBar").style.width = `${stressLevel}%`;
+
       document.getElementById("completedSessions").textContent = sessionsDone;
       const goalPercent = Math.min(Math.round((sessionsDone / dailyGoal) * 100), 100);
       document.getElementById("goalProgress").textContent = `${goalPercent}%`;
@@ -362,17 +480,18 @@
       localStorage.setItem("userLevel", userLevel);
       localStorage.setItem("userXP", userXP);
       localStorage.setItem("sessionsDone", sessionsDone);
+      localStorage.setItem("stressLevel", stressLevel);
     }
 
     function resetStats() {
-      if (confirm("Deseja realmente zerar o contador de sessões e o progresso de hoje?")) {
+      if (confirm("Deseja zerar as estatísticas e o estresse do professor?")) {
         sessionsDone = 0;
+        stressLevel = 0;
         saveStats();
         updateGamificationUI();
       }
     }
 
-    // Registro do ServiceWorker
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("sw.js");
     }
