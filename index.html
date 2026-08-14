@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Professor de Estudos - Fase 2</title>
+  <title>Professor de Estudos - Fase 3</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#00adb5">
   <style>
@@ -18,12 +18,11 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      padding: 20px;
+      padding: 15px;
       text-align: center;
       transition: background-color 0.4s ease;
     }
 
-    /* Temas / Cenários de Fundo */
     body.theme-dark { background-color: #1a1a1d; }
     body.theme-dojo { background-color: #2b1e1e; }
     body.theme-cyber { background-color: #0f1026; }
@@ -32,63 +31,47 @@
     .card {
       background: #2d2d34;
       border-radius: 20px;
-      padding: 20px;
+      padding: 18px;
       width: 100%;
       max-width: 380px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
-    
-    /* Painel de Nível e XP */
-    .user-stats {
-      background: #222226;
-      border-radius: 12px;
-      padding: 10px;
-      margin-bottom: 12px;
-    }
-    .stat-info {
+
+    /* Topo: Streak e Nível */
+    .header-stats {
       display: flex;
       justify-content: space-between;
-      font-weight: bold;
-      margin-bottom: 4px;
+      align-items: center;
+      background: #222226;
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
       font-size: 0.85rem;
-      color: #00adb5;
+      font-weight: bold;
     }
+    .streak-badge { color: #ff9f43; display: flex; align-items: center; gap: 4px; }
+    .level-badge { color: #00adb5; }
+
     .progress-bar-bg {
       background: #3e3e4a;
       border-radius: 8px;
-      height: 8px;
+      height: 6px;
       width: 100%;
       overflow: hidden;
       margin-bottom: 8px;
     }
-    .progress-bar-fill {
-      background: #00adb5;
-      height: 100%;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-
-    /* Barra de Estresse do Professor */
-    .stress-fill {
-      background: #e63946 !important;
-    }
+    .progress-bar-fill { background: #00adb5; height: 100%; width: 0%; transition: width 0.3s; }
+    .stress-fill { background: #e63946 !important; }
 
     .mascot-container {
-      height: 170px;
+      height: 150px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
-    .mascot {
-      max-height: 100%;
-      max-width: 100%;
-      border-radius: 10px;
-      transition: transform 0.2s ease;
-    }
-    .shake {
-      animation: shake 0.4s infinite;
-    }
+    .mascot { max-height: 100%; max-width: 100%; border-radius: 10px; }
+    .shake { animation: shake 0.4s infinite; }
     @keyframes shake {
       0% { transform: translate(2px, 2px) rotate(0deg); }
       20% { transform: translate(-3px, 0px) rotate(-2deg); }
@@ -103,161 +86,110 @@
       border-radius: 12px;
       padding: 10px;
       font-size: 0.85rem;
-      margin-bottom: 12px;
-      min-height: 50px;
+      margin-bottom: 10px;
+      min-height: 48px;
       display: flex;
       align-items: center;
       justify-content: center;
-      line-height: 1.3;
+      line-height: 1.2;
     }
 
-    /* Modos de Tempo */
-    .time-selector {
-      display: flex;
-      gap: 6px;
-      justify-content: center;
-      margin-bottom: 12px;
-    }
-    .time-btn {
-      background: #3e3e4a;
-      color: #fff;
-      border: none;
-      padding: 6px 8px;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      cursor: pointer;
-    }
-    .time-btn.active {
-      background: #00adb5;
-    }
+    .timer { font-size: 2.5rem; font-weight: bold; color: #00adb5; margin-bottom: 10px; }
 
-    .timer {
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: #00adb5;
-      margin-bottom: 12px;
-    }
+    .time-selector { display: flex; gap: 6px; justify-content: center; margin-bottom: 10px; }
+    .time-btn { background: #3e3e4a; color: #fff; border: none; padding: 6px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
+    .time-btn.active { background: #00adb5; }
 
-    .counters-container {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      margin-bottom: 12px;
-      background: #222226;
-      padding: 8px 12px;
-      border-radius: 10px;
-    }
-
-    /* Customizações (Cenário e Avatar) */
-    .custom-panel {
+    /* Módulos da Fase 3: Lista de Assuntos & Simulados */
+    .box-section {
       background: #222226;
       border-radius: 10px;
       padding: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
+      text-align: left;
       font-size: 0.8rem;
     }
-    .custom-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-    .custom-row:last-child { margin-bottom: 0; }
-
-    select {
+    .box-title { font-weight: bold; color: #00adb5; margin-bottom: 6px; display: flex; justify-content: space-between; }
+    
+    .input-group { display: flex; gap: 6px; margin-bottom: 6px; }
+    input[type="text"], input[type="date"] {
+      flex: 1;
       background: #3e3e4a;
-      color: #fff;
       border: none;
-      padding: 4px 8px;
+      color: #fff;
+      padding: 6px;
       border-radius: 6px;
       font-size: 0.75rem;
     }
+    .add-btn { background: #00adb5; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-    .buttons {
+    ul.item-list { list-style: none; max-height: 90px; overflow-y: auto; }
+    ul.item-list li {
       display: flex;
-      gap: 8px;
-      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      background: #2d2d34;
+      padding: 5px 8px;
+      border-radius: 6px;
+      margin-bottom: 4px;
     }
-    button.main-btn {
-      background: #00adb5;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    .remove-item { color: #e63946; cursor: pointer; font-weight: bold; margin-left: 8px; }
+
+    .buttons { display: flex; gap: 8px; flex-direction: column; }
+    button.main-btn { background: #00adb5; color: white; border: none; padding: 10px; border-radius: 10px; font-size: 0.95rem; font-weight: bold; cursor: pointer; }
     button.pause { background: #f39c12; }
     button.cancel { background: #e63946; }
-    button.reset-btn {
-      background: transparent;
-      color: #888;
-      border: none;
-      font-size: 0.75rem;
-      margin-top: 8px;
-      cursor: pointer;
-      text-decoration: underline;
-    }
+    
+    .custom-row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.75rem; }
+    select { background: #3e3e4a; color: #fff; border: none; padding: 4px 6px; border-radius: 6px; }
   </style>
 </head>
 <body id="bgBody" class="theme-dark">
 
   <div class="card">
-    <div class="user-stats">
-      <div class="stat-info">
-        <span id="levelDisplay">Nível 1</span>
-        <span id="xpDisplay">0 / 100 XP</span>
-      </div>
-      <div class="progress-bar-bg">
-        <div id="xpBar" class="progress-bar-fill"></div>
-      </div>
-
-      <div class="stat-info" style="color: #e63946; margin-top: 4px;">
-        <span>Estresse do Professor</span>
-        <span id="stressDisplay">0%</span>
-      </div>
-      <div class="progress-bar-bg">
-        <div id="stressBar" class="progress-bar-fill stress-fill"></div>
-      </div>
+    <div class="header-stats">
+      <span class="streak-badge">🔥 <span id="streakCount">0</span> dias</span>
+      <span class="level-badge" id="levelDisplay">Nível 1</span>
     </div>
+
+    <div class="progress-bar-bg"><div id="xpBar" class="progress-bar-fill"></div></div>
+    <div class="custom-row" style="color: #e63946; margin-bottom: 2px;">
+      <span>Estresse do Professor:</span>
+      <span id="stressDisplay">0%</span>
+    </div>
+    <div class="progress-bar-bg"><div id="stressBar" class="progress-bar-fill stress-fill"></div></div>
 
     <div class="mascot-container">
       <img id="mascot" class="mascot" src="Professor_neutro.png" alt="Mascote">
     </div>
-    <div id="speech" class="speech-bubble">Estou de olho em você. Vamos começar?</div>
-
-    <div class="custom-panel">
-      <div class="custom-row">
-        <label>🎨 Cenário:</label>
-        <select id="selectTheme" onchange="changeTheme(this.value)">
-          <option value="theme-dark">Padrão Escuro</option>
-          <option value="theme-dojo">Dojo Vermelho</option>
-          <option value="theme-cyber">Cyberpunk</option>
-          <option value="theme-nature">Florestal</option>
-        </select>
-      </div>
-      <div class="custom-row">
-        <label>🎭 Estilo:</label>
-        <select id="selectAvatar" onchange="changeAvatarStyle(this.value)">
-          <option value="default">Professor Padrão</option>
-          <option value="anime">Professor Anime</option>
-        </select>
-      </div>
-    </div>
+    <div id="speech" class="speech-bubble">O que vamos estudar hoje? Organize suas matérias abaixo!</div>
 
     <div class="time-selector">
-      <button class="time-btn" onclick="selectTime(15, this)">15 min</button>
-      <button class="time-btn active" onclick="selectTime(25, this)">25 min</button>
-      <button class="time-btn" onclick="selectTime(50, this)">50 min</button>
-      <button class="time-btn" onclick="selectTime(5, this)">5 min (Pausa)</button>
+      <button class="time-btn" onclick="selectTime(15, this)">15m</button>
+      <button class="time-btn active" onclick="selectTime(25, this)">25m</button>
+      <button class="time-btn" onclick="selectTime(50, this)">50m</button>
+      <button class="time-btn" onclick="selectTime(5, this)">5m Pausa</button>
     </div>
 
     <div id="timer" class="timer">25:00</div>
 
-    <div class="counters-container">
-      <div>Sessões: <strong id="completedSessions">0</strong></div>
-      <div>Meta Hoje: <strong id="goalProgress">0%</strong></div>
+    <div class="box-section">
+      <div class="box-title">📚 O que estudar hoje:</div>
+      <div class="input-group">
+        <input type="text" id="subjectInput" placeholder="Ex: Matemática - Geometria">
+        <button class="add-btn" onclick="addSubject()">+</button>
+      </div>
+      <ul id="subjectList" class="item-list"></ul>
+    </div>
+
+    <div class="box-section">
+      <div class="box-title">🎯 Próximo Simulado:</div>
+      <div class="input-group">
+        <input type="text" id="simTitle" placeholder="Ex: ENEM / Vestibular">
+        <input type="date" id="simDate">
+        <button class="add-btn" onclick="addSimulado()">+</button>
+      </div>
+      <ul id="simList" class="item-list"></ul>
     </div>
 
     <div class="buttons">
@@ -267,32 +199,28 @@
       <button id="btnCancel" class="main-btn cancel" onclick="cancelTimer()" style="display: none;">Desistir / Cancelar</button>
     </div>
 
-    <button class="reset-btn" onclick="resetStats()">Resetar Progresso de Hoje</button>
+    <div class="custom-row">
+      <label>🎨 Cenário:</label>
+      <select id="selectTheme" onchange="changeTheme(this.value)">
+        <option value="theme-dark">Escuro</option>
+        <option value="theme-dojo">Dojo</option>
+        <option value="theme-cyber">Cyber</option>
+        <option value="theme-nature">Florestal</option>
+      </select>
+    </div>
   </div>
 
   <script>
-    // Sprites por estilo de avatar
-    const AVATAR_SETS = {
-      default: {
-        neutro: "Professor_neutro.png",
-        estudando: "Professor_estudando.png",
-        feliz: "Professor_feliz.png",
-        bravo: "Professor_bravo.png"
-      },
-      anime: {
-        neutro: "Professor_neutro.png", // Usa suas imagens enviadas
-        estudando: "Professor_estudando.png",
-        feliz: "Professor_feliz.png",
-        bravo: "Professor_bravo.png"
-      }
+    const SPRITES = {
+      neutro: "Professor_neutro.png",
+      estudando: "Professor_estudando.png",
+      feliz: "Professor_feliz.png",
+      bravo: "Professor_bravo.png"
     };
-
-    let currentAvatarSet = "default";
 
     const AUDIO_BRONCA = new Audio("https://assets.mixkit.co/active_storage/sfx/2874/2874-preview.mp3");
     const AUDIO_SUCESSO = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
 
-    // Estado Geral (Salvo no localStorage)
     let selectedMinutes = 25;
     let timeLeft = 25 * 60;
     let timerInterval = null;
@@ -300,9 +228,12 @@
 
     let userLevel = parseInt(localStorage.getItem("userLevel")) || 1;
     let userXP = parseInt(localStorage.getItem("userXP")) || 0;
-    let sessionsDone = parseInt(localStorage.getItem("sessionsDone")) || 0;
-    let stressLevel = parseInt(localStorage.getItem("stressLevel")) || 0; // Estresse de 0 a 100
-    const dailyGoal = 4;
+    let stressLevel = parseInt(localStorage.getItem("stressLevel")) || 0;
+    let streakCount = parseInt(localStorage.getItem("streakCount")) || 0;
+    let lastStudyDate = localStorage.getItem("lastStudyDate") || "";
+
+    let subjects = JSON.parse(localStorage.getItem("subjects")) || [];
+    let simulados = JSON.parse(localStorage.getItem("simulados")) || [];
 
     const mascotImg = document.getElementById("mascot");
     const speechEl = document.getElementById("speech");
@@ -312,22 +243,18 @@
     const btnFinish = document.getElementById("btnFinish");
     const btnCancel = document.getElementById("btnCancel");
 
-    // Inicializar
-    const savedTheme = localStorage.getItem("selectedTheme") || "theme-dark";
-    changeTheme(savedTheme);
-    document.getElementById("selectTheme").value = savedTheme;
-
-    updateDisplay();
+    // Inicialização
+    checkStreak();
+    renderSubjects();
+    renderSimulados();
     updateGamificationUI();
 
     function selectTime(minutes, element) {
       if (timerInterval) return;
       selectedMinutes = minutes;
       timeLeft = minutes * 60;
-      
       document.querySelectorAll(".time-btn").forEach(btn => btn.classList.remove("active"));
       element.classList.add("active");
-      
       updateDisplay();
     }
 
@@ -338,32 +265,19 @@
     }
 
     function setMascotState(state, message, isAngry = false) {
-      mascotImg.src = AVATAR_SETS[currentAvatarSet][state];
+      mascotImg.src = SPRITES[state];
       speechEl.textContent = message;
-      if (isAngry || stressLevel >= 75) {
-        mascotImg.classList.add("shake");
-      } else {
-        mascotImg.classList.remove("shake");
-      }
-    }
-
-    function changeTheme(themeClass) {
-      document.body.className = themeClass;
-      localStorage.setItem("selectedTheme", themeClass);
-    }
-
-    function changeAvatarStyle(style) {
-      currentAvatarSet = style;
-      setMascotState("neutro", "Estilo alterado! Preparado para o foco?");
+      if (isAngry || stressLevel >= 75) mascotImg.classList.add("shake");
+      else mascotImg.classList.remove("shake");
     }
 
     function startTimer() {
       if (isPaused) {
         isPaused = false;
         btnPause.textContent = "Pausar";
-        setMascotState("estudando", "Voltando ao trabalho!");
+        setMascotState("estudando", "Voltando ao foco!");
       } else {
-        setMascotState("estudando", "Foco total agora! Sem distrações.");
+        setMascotState("estudando", "Concentração total no assunto escolhido!");
       }
 
       btnStart.style.display = "none";
@@ -375,7 +289,6 @@
         if (!isPaused) {
           timeLeft--;
           updateDisplay();
-
           if (timeLeft <= 0) {
             clearInterval(timerInterval);
             finishTimer();
@@ -388,8 +301,8 @@
       if (!isPaused) {
         isPaused = true;
         btnPause.textContent = "Retomar";
-        addStress(15); // Pausar aumenta o estresse em 15%
-        setMascotState("neutro", "Pausou?! Espero que seja urgente... O tempo corre!");
+        addStress(15);
+        setMascotState("neutro", "Pausou? O tempo continua passando...");
       } else {
         startTimer();
       }
@@ -399,16 +312,12 @@
       clearInterval(timerInterval);
       timerInterval = null;
       AUDIO_SUCESSO.play();
-      
-      // Concluir reduz o estresse
       reduceStress(25);
       
-      setMascotState("feliz", "Excelente trabalho! É assim que se atinge metas!");
-      
-      sessionsDone++;
+      updateStreakOnCompletion();
       addXP(selectedMinutes * 2);
       
-      saveStats();
+      setMascotState("feliz", "Excelente bloco de estudos! Foco mantido!");
       resetButtons();
     }
 
@@ -417,25 +326,133 @@
       timerInterval = null;
       isPaused = false;
       AUDIO_BRONCA.play();
-      
-      // Cancelar aumenta MUITO o estresse
       addStress(40);
-      
-      setMascotState("bravo", "DESISTIU?! Inadmissível! Meu nível de estresse aumentou!", true);
+      setMascotState("bravo", "DESISTIU?! Assim a aprovação não vem!", true);
       resetButtons();
+    }
+
+    // Lógica do Streak (Sequência de dias)
+    function checkStreak() {
+      const today = new Date().toDateString();
+      if (lastStudyDate) {
+        const lastDate = new Date(lastStudyDate);
+        const diffTime = Math.abs(new Date(today) - lastDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays > 1) {
+          streakCount = 0; // Perdeu a sequência
+          localStorage.setItem("streakCount", 0);
+        }
+      }
+      document.getElementById("streakCount").textContent = streakCount;
+    }
+
+    function updateStreakOnCompletion() {
+      const today = new Date().toDateString();
+      if (lastStudyDate !== today) {
+        streakCount++;
+        lastStudyDate = today;
+        localStorage.setItem("streakCount", streakCount);
+        localStorage.setItem("lastStudyDate", lastStudyDate);
+      }
+      document.getElementById("streakCount").textContent = streakCount;
+    }
+
+    // Assuntos / Matérias
+    function addSubject() {
+      const input = document.getElementById("subjectInput");
+      if (!input.value.trim()) return;
+      subjects.push({ id: Date.now(), title: input.value });
+      input.value = "";
+      saveSubjects();
+    }
+
+    function removeSubject(id) {
+      subjects = subjects.filter(s => s.id !== id);
+      saveSubjects();
+    }
+
+    function saveSubjects() {
+      localStorage.setItem("subjects", JSON.stringify(subjects));
+      renderSubjects();
+    }
+
+    function renderSubjects() {
+      const list = document.getElementById("subjectList");
+      list.innerHTML = "";
+      subjects.forEach(s => {
+        list.innerHTML += `<li>${s.title} <span class="remove-item" onclick="removeSubject(${s.id})">✕</span></li>`;
+      });
+    }
+
+    // Simulados
+    function addSimulado() {
+      const title = document.getElementById("simTitle").value;
+      const date = document.getElementById("simDate").value;
+      if (!title || !date) return;
+      simulados.push({ id: Date.now(), title, date });
+      document.getElementById("simTitle").value = "";
+      document.getElementById("simDate").value = "";
+      saveSimulados();
+    }
+
+    function removeSimulado(id) {
+      simulados = simulados.filter(s => s.id !== id);
+      saveSimulados();
+    }
+
+    function saveSimulados() {
+      localStorage.setItem("simulados", JSON.stringify(simulados));
+      renderSimulados();
+    }
+
+    function renderSimulados() {
+      const list = document.getElementById("simList");
+      list.innerHTML = "";
+      simulados.forEach(s => {
+        const today = new Date();
+        const simDate = new Date(s.date);
+        const diffDays = Math.ceil((simDate - today) / (1000 * 60 * 60 * 24));
+        const daysText = diffDays >= 0 ? `Faltam ${diffDays} dias` : "Já passou";
+        
+        list.innerHTML += `<li>${s.title} (${daysText}) <span class="remove-item" onclick="removeSimulado(${s.id})">✕</span></li>`;
+      });
     }
 
     function addStress(amount) {
       stressLevel = Math.min(stressLevel + amount, 100);
       updateGamificationUI();
-      saveStats();
     }
 
     function reduceStress(amount) {
       stressLevel = Math.max(stressLevel - amount, 0);
       updateGamificationUI();
-      saveStats();
     }
+
+    function addXP(amount) {
+      userXP += amount;
+      const xpNeeded = userLevel * 100;
+      if (userXP >= xpNeeded) {
+        userXP -= xpNeeded;
+        userLevel++;
+        alert(`🎉 Subiu para o Nível ${userLevel}!`);
+      }
+      updateGamificationUI();
+    }
+
+    function updateGamificationUI() {
+      const xpNeeded = userLevel * 100;
+      document.getElementById("levelDisplay").textContent = `Nível ${userLevel}`;
+      document.getElementById("xpBar").style.width = `${Math.min((userXP / xpNeeded) * 100, 100)}%`;
+      document.getElementById("stressDisplay").textContent = `${stressLevel}%`;
+      document.getElementById("stressBar").style.width = `${stressLevel}%`;
+
+      localStorage.setItem("userLevel", userLevel);
+      localStorage.setItem("userXP", userXP);
+      localStorage.setItem("stressLevel", stressLevel);
+    }
+
+    function changeTheme(themeClass) { document.body.className = themeClass; }
 
     function resetButtons() {
       btnStart.style.display = "block";
@@ -447,54 +464,8 @@
       updateDisplay();
     }
 
-    function addXP(amount) {
-      userXP += amount;
-      const xpNeeded = userLevel * 100;
-
-      if (userXP >= xpNeeded) {
-        userXP -= xpNeeded;
-        userLevel++;
-        alert(`🎉 PARABÉNS! Você subiu para o Nível ${userLevel}!`);
-      }
-      updateGamificationUI();
-    }
-
-    function updateGamificationUI() {
-      const xpNeeded = userLevel * 100;
-      document.getElementById("levelDisplay").textContent = `Nível ${userLevel}`;
-      document.getElementById("xpDisplay").textContent = `${userXP} / ${xpNeeded} XP`;
-      
-      const xpPercent = Math.min((userXP / xpNeeded) * 100, 100);
-      document.getElementById("xpBar").style.width = `${xpPercent}%`;
-
-      // Barra de Estresse
-      document.getElementById("stressDisplay").textContent = `${stressLevel}%`;
-      document.getElementById("stressBar").style.width = `${stressLevel}%`;
-
-      document.getElementById("completedSessions").textContent = sessionsDone;
-      const goalPercent = Math.min(Math.round((sessionsDone / dailyGoal) * 100), 100);
-      document.getElementById("goalProgress").textContent = `${goalPercent}%`;
-    }
-
-    function saveStats() {
-      localStorage.setItem("userLevel", userLevel);
-      localStorage.setItem("userXP", userXP);
-      localStorage.setItem("sessionsDone", sessionsDone);
-      localStorage.setItem("stressLevel", stressLevel);
-    }
-
-    function resetStats() {
-      if (confirm("Deseja zerar as estatísticas e o estresse do professor?")) {
-        sessionsDone = 0;
-        stressLevel = 0;
-        saveStats();
-        updateGamificationUI();
-      }
-    }
-
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js");
-    }
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
   </script>
 </body>
 </html>
+
