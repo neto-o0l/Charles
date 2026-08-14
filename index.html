@@ -15,6 +15,7 @@
   <meta name="apple-mobile-web-app-title" content="Professor">
   <link rel="apple-touch-icon" href="Professor_neutro.png">
 
+  <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body {
@@ -117,7 +118,6 @@
     }
     .box-title { font-weight: bold; color: #00adb5; margin-bottom: 6px; display: flex; justify-content: space-between; }
 
-    /* Estatísticas de Tempo */
     .stats-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -160,6 +160,7 @@
     button.main-btn { background: #00adb5; color: white; border: none; padding: 10px; border-radius: 10px; font-size: 0.95rem; font-weight: bold; cursor: pointer; }
     button.pause { background: #f39c12; }
     button.cancel { background: #e63946; }
+    button.install { background: #2ed573; margin-bottom: 4px; }
 
     .custom-row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.75rem; }
     select { background: #3e3e4a; color: #fff; border: none; padding: 4px 6px; border-radius: 6px; }
@@ -195,6 +196,7 @@
     <div id="timer" class="timer">25:00</div>
 
     <div class="buttons" style="margin-bottom: 10px;">
+      <button id="btnInstall" class="main-btn install" style="display: none;">📲 Instalar Aplicativo</button>
       <button id="btnStart" class="main-btn" onclick="startTimer()">Iniciar Estudos</button>
       <button id="btnPause" class="main-btn pause" onclick="pauseTimer()" style="display: none;">Pausar</button>
       <button id="btnFinish" class="main-btn" onclick="finishTimer()" style="display: none;">Concluir Tarefa</button>
@@ -392,7 +394,6 @@
 
     // Sistema de Rivais Inteligentes
     function updateRivals() {
-      // Quando o jogador estuda, os rivais também progridem um pouco para manter a competição!
       rivals.forEach(r => {
         r.xp += Math.floor(Math.random() * (selectedMinutes * 1.5));
       });
@@ -558,7 +559,37 @@
       updateDisplay();
     }
 
-    if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+    // Registro do ServiceWorker
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js");
+    }
+
+    // Lógica do Botão de Instalar PWA
+    let deferredPrompt;
+    const btnInstall = document.getElementById('btnInstall');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (btnInstall) {
+        btnInstall.style.display = 'block';
+      }
+    });
+
+    if (btnInstall) {
+      btnInstall.addEventListener('click', () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              btnInstall.style.display = 'none';
+            }
+            deferredPrompt = null;
+          });
+        }
+      });
+    }
   </script>
 </body>
 </html>
+
