@@ -554,4 +554,13 @@
   </script>
 </body>
 </html>
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Exibe um alerta ou botão de instalação se quiser
+  console.log("PWA pronto para ser instalado!");
+});
+
 
