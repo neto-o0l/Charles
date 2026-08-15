@@ -28,12 +28,18 @@
       min-height: 100vh;
       padding: 15px;
       text-align: center;
+      transition: background-color 0.4s ease;
     }
 
+    /* Cores de Fundo Personalizadas */
     body.theme-dark { background-color: #1a1a1d; }
     body.theme-dojo { background-color: #2b1e1e; }
     body.theme-cyber { background-color: #0f1026; }
     body.theme-nature { background-color: #1b261c; }
+    body.theme-azul-real { background-color: #0d233a; }
+    body.theme-rosa-choque { background-color: #4a0028; }
+    body.theme-vermelho-vinho { background-color: #3b0a0a; }
+    body.theme-verde-floresta { background-color: #0a2e18; }
 
     .card {
       background: #2d2d34;
@@ -69,6 +75,7 @@
       margin-bottom: 8px;
     }
     .progress-bar-fill { background: #00adb5; height: 100%; width: 0%; transition: width 0.3s; }
+    .chapters-fill { background: #2ed573 !important; }
     .stress-fill { background: #e63946 !important; }
 
     .mascot-container {
@@ -145,7 +152,7 @@
     }
     .add-btn { background: #00adb5; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-    ul.item-list { list-style: none; max-height: 120px; overflow-y: auto; }
+    ul.item-list { list-style: none; max-height: 140px; overflow-y: auto; }
     ul.item-list li {
       display: flex;
       justify-content: space-between;
@@ -162,7 +169,6 @@
     button.cancel { background: #e63946; }
     button.install { background: #2ed573; }
 
-    /* Sala de Aula Virtual */
     .classroom-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -177,7 +183,6 @@
     }
     .desk.studying { border: 2px solid #2ed573; }
 
-    /* Loja de Conquistas */
     .shop-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -195,6 +200,8 @@
     }
     .buy-btn { background: #2ed573; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.7rem; }
     .buy-btn:disabled { background: #555; cursor: not-allowed; }
+
+    .custom-row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.75rem; }
   </style>
 </head>
 <body id="bgBody" class="theme-dark">
@@ -207,7 +214,7 @@
     </div>
 
     <div class="progress-bar-bg"><div id="xpBar" class="progress-bar-fill"></div></div>
-    <div style="display:flex; justify-between; font-size: 0.75rem; color: #e63946; margin-bottom: 2px;">
+    <div style="display:flex; justify-content: space-between; font-size: 0.75rem; color: #e63946; margin-bottom: 2px;">
       <span>Estresse: <span id="stressDisplay">0%</span></span>
     </div>
     <div class="progress-bar-bg"><div id="stressBar" class="progress-bar-fill stress-fill"></div></div>
@@ -226,10 +233,24 @@
       <button id="btnFinish" class="main-btn" onclick="finishTimer()" style="display: none;">Concluir Bloco</button>
       <button id="btnCancel" class="main-btn cancel" onclick="cancelTimer()" style="display: none;">Desistir</button>
     </div>
+
+    <div class="custom-row">
+      <label>🎨 Tema do Fundo:</label>
+      <select id="selectTheme" onchange="changeTheme(this.value)">
+        <option value="theme-dark">Escuro Padrão</option>
+        <option value="theme-azul-real">Azul Real</option>
+        <option value="theme-rosa-choque">Rosa Choque</option>
+        <option value="theme-vermelho-vinho">Vermelho Vinho</option>
+        <option value="theme-verde-floresta">Verde Floresta</option>
+        <option value="theme-dojo">Dojo</option>
+        <option value="theme-cyber">Cyber</option>
+      </select>
+    </div>
   </div>
 
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('cronograma')">📅 Cronograma</button>
+    <button class="tab-btn" onclick="switchTab('livros')">📖 Livros & Capítulos</button>
     <button class="tab-btn" onclick="switchTab('radar')">🕸️ Radar</button>
     <button class="tab-btn" onclick="switchTab('questoes')">📝 Questões</button>
     <button class="tab-btn" onclick="switchTab('loja')">🏆 Loja (100)</button>
@@ -245,8 +266,29 @@
         <ul id="scheduleList" class="item-list"></ul>
       </div>
       <div class="box-section">
-        <div class="box-title">⚠️ Atrasados / Pêndencias:</div>
+        <div class="box-title">⚠️ Atrasados / Pendências:</div>
         <ul id="pendingList" class="item-list"></ul>
+      </div>
+    </div>
+
+    <div id="tab-livros" class="tab-content">
+      <div class="box-section">
+        <div class="box-title">📊 Progresso Geral dos Capítulos:</div>
+        <div style="font-size: 0.75rem; margin-bottom: 4px; display:flex; justify-content:space-between;">
+          <span>Concluídos: <strong id="totalCapCompleted">0</strong> / <span id="totalCapCount">188</span></span>
+          <span id="capPercent">0%</span>
+        </div>
+        <div class="progress-bar-bg"><div id="capProgressBar" class="progress-bar-fill chapters-fill"></div></div>
+      </div>
+
+      <div class="box-section">
+        <div class="box-title">📖 Capítulos Programados para Hoje:</div>
+        <ul id="todayChaptersList" class="item-list"></ul>
+      </div>
+
+      <div class="box-section">
+        <div class="box-title">📚 Capítulos Concluídos por Matéria:</div>
+        <ul id="subjectsChaptersList" class="item-list"></ul>
       </div>
     </div>
 
@@ -330,6 +372,23 @@
     let stressLevel = parseInt(localStorage.getItem("stressLevel")) || 0;
     let streakCount = parseInt(localStorage.getItem("streakCount")) || 0;
     let waterConsumed = parseInt(localStorage.getItem("waterConsumed")) || 0;
+    let currentTheme = localStorage.getItem("currentTheme") || "theme-dark";
+
+    // Estrutura de Capítulos de Cada Matéria
+    let subjectChapters = JSON.parse(localStorage.getItem("subjectChapters")) || {
+      "TQM (Matemática Fund.)": { done: 0, total: 46 },
+      "TQM (Matemática Médio)": { done: 0, total: 20 },
+      "TQP (Português)": { done: 0, total: 10 },
+      "Física": { done: 0, total: 15 },
+      "Química": { done: 0, total: 12 },
+      "Biologia": { done: 0, total: 18 },
+      "Redação": { done: 0, total: 30 },
+      "Inglês": { done: 0, total: 16 },
+      "História": { done: 0, total: 13 },
+      "Geografia": { done: 0, total: 12 },
+      "Sociologia": { done: 0, total: 17 },
+      "Filosofia": { done: 0, total: 14 }
+    };
 
     // Conhecimento por Matéria para o Gráfico de Teia (0 a 100)
     let knowledgeStats = JSON.parse(localStorage.getItem("knowledgeStats")) || {
@@ -356,17 +415,24 @@
     // Elementos DOM
     const timerEl = document.getElementById("timer");
     const mascotImg = document.getElementById("mascot");
-    const speechEl = document.getElementById("speech");
 
     // Inicialização
+    changeTheme(currentTheme);
+    document.getElementById("selectTheme").value = currentTheme;
     initSchedule();
     updateUI();
     renderClassroom();
     renderShop();
     renderWorkouts();
+    renderChaptersTab();
 
     let radarChartInstance = null;
     initRadarChart();
+
+    function changeTheme(themeClass) {
+      document.body.className = themeClass;
+      localStorage.setItem("currentTheme", themeClass);
+    }
 
     function switchTab(tabId) {
       document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
@@ -420,6 +486,51 @@
       renderPending();
     }
 
+    // Lógica da Aba Livros e Capítulos
+    function renderChaptersTab() {
+      let totalDone = 0;
+      let totalCap = 0;
+
+      const subList = document.getElementById("subjectsChaptersList");
+      subList.innerHTML = "";
+
+      for (let sub in subjectChapters) {
+        const item = subjectChapters[sub];
+        totalDone += item.done;
+        totalCap += item.total;
+
+        subList.innerHTML += `<li>
+          <span>${sub}: <strong>${item.done}/${item.total}</strong> caps</span>
+          <div>
+            <button class="add-btn" style="padding: 2px 6px;" onclick="changeCap('${sub}', 1)">+</button>
+            <button class="add-btn" style="padding: 2px 6px; background:#e63946;" onclick="changeCap('${sub}', -1)">-</button>
+          </div>
+        </li>`;
+      }
+
+      const percent = Math.floor((totalDone / totalCap) * 100) || 0;
+      document.getElementById("totalCapCompleted").textContent = totalDone;
+      document.getElementById("totalCapCount").textContent = totalCap;
+      document.getElementById("capPercent").textContent = `${percent}%`;
+      document.getElementById("capProgressBar").style.width = `${percent}%`;
+
+      // Atualiza capítulos do dia baseado nas matérias do cronograma de hoje
+      const dayIdx = new Date().getDay();
+      const todayList = document.getElementById("todayChaptersList");
+      todayList.innerHTML = "";
+      weeklySchedule[dayIdx].forEach(item => {
+        todayList.innerHTML += `<li>📖 Meta de Cap. para: <strong>${item}</strong></li>`;
+      });
+    }
+
+    function changeCap(sub, delta) {
+      const item = subjectChapters[sub];
+      item.done = Math.max(0, Math.min(item.done + delta, item.total));
+      if (delta > 0) addXP(30); // Ganha 30 XP ao concluir 1 capítulo
+      localStorage.setItem("subjectChapters", JSON.stringify(subjectChapters));
+      renderChaptersTab();
+    }
+
     // Cronômetro
     function startTimer() {
       document.getElementById("btnStart").style.display = "none";
@@ -463,7 +574,6 @@
       AUDIO_BRONCA.play();
       addStress(30);
       
-      // Empurra o bloco atual para as pendências
       const dayIdx = new Date().getDay();
       if (weeklySchedule[dayIdx].length > 0) {
         pendingTasks.push(weeklySchedule[dayIdx][0]);
@@ -509,7 +619,7 @@
       const count = parseInt(document.getElementById("questCount").value);
       if (!count || count <= 0) return;
 
-      const gainedXP = count * 5; // 5 XP por questão
+      const gainedXP = count * 5;
       addXP(gainedXP);
 
       knowledgeStats[subject] = Math.min(knowledgeStats[subject] + Math.ceil(count / 2), 100);
@@ -522,7 +632,7 @@
       alert(`🎉 +${gainedXP} XP obtidos por resolver ${count} questões de ${subject}!`);
     }
 
-    // Loja de 100 Conquistas (Exemplo Gerado)
+    // Loja de 100 Conquistas
     function renderShop() {
       const shopContainer = document.getElementById("shopContainer");
       shopContainer.innerHTML = "";
@@ -593,7 +703,7 @@
       renderWorkouts();
     }
 
-    // Gamificação e Auxiliares
+    // Gamificação
     function addXP(val) {
       userXP += val;
       const xpNeeded = userLevel * 100;
@@ -627,4 +737,3 @@
   </script>
 </body>
 </html>
-
