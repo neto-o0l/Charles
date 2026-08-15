@@ -148,7 +148,7 @@
     }
     .add-btn { background: #00adb5; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-    ul.item-list { list-style: none; max-height: 160px; overflow-y: auto; }
+    ul.item-list { list-style: none; max-height: 180px; overflow-y: auto; }
     ul.item-list li {
       display: flex;
       justify-content: space-between;
@@ -157,6 +157,7 @@
       padding: 6px 8px;
       border-radius: 6px;
       margin-bottom: 4px;
+      gap: 4px;
     }
 
     .buttons { display: flex; gap: 6px; flex-direction: column; }
@@ -253,6 +254,7 @@
     </div>
 
     <!-- Timer -->
+    <div id="activeSubjectLabel" style="font-size:0.8rem; color:#00adb5; font-weight:bold; height:16px;"></div>
     <div id="timer" class="timer">50:00</div>
 
     <!-- Controles -->
@@ -294,7 +296,7 @@
   <!-- Card Principal com os Conteúdos das Abas -->
   <div class="card">
     
-    <!-- ABA 1: CRONOGRAMA ADAPTATIVO -->
+    <!-- ABA 1: CRONOGRAMA ADAPTATIVO (+XP AO CONCLUIR) -->
     <div id="tab-cronograma" class="tab-content active">
       <div class="box-section">
         <div class="box-title">📅 Blocos de Hoje (<span id="currentDayName"></span>):</div>
@@ -433,6 +435,7 @@
     let timeLeft = selectedMinutes * 60;
     let timerInterval = null;
     let isPaused = false;
+    let currentStudyingSubject = "";
 
     let userLevel = parseInt(localStorage.getItem("userLevel")) || 1;
     let userXP = parseInt(localStorage.getItem("userXP")) || 0;
@@ -473,7 +476,7 @@
       "Inglês": 0, "Sociologia": 0, "Filosofia": 0
     };
 
-    const weeklySchedule = {
+    const weeklySchedule = JSON.parse(localStorage.getItem("weeklySchedule")) || {
       1: ["Matemática (50m)", "Física (50m)", "Língua Portuguesa (50m)", "Matemática (50m)", "Química (50m)"],
       2: ["Matemática (50m)", "Física (50m)", "História (50m)", "Matemática (50m)", "Geografia (50m)"],
       3: ["Redação (50m)", "Redação Prática (50m)", "Biologia (50m)", "Língua Portuguesa (50m)", "Inglês (50m)"],
@@ -506,7 +509,7 @@
     initRadarChart();
 
     function changeTimerDuration(val) {
-      if (timerInterval) return; // Não troca se o temporizador estiver rodando
+      if (timerInterval) return;
       selectedMinutes = parseInt(val);
       localStorage.setItem("selectedMinutes", selectedMinutes);
       timeLeft = selectedMinutes * 60;
@@ -526,6 +529,7 @@
       document.getElementById(`tab-${tabId}`).classList.add("active");
     }
 
+    // Cronograma & Ganho de XP
     function initSchedule() {
       const dayIdx = new Date().getDay();
       const daysNames = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
@@ -533,20 +537,38 @@
 
       const list = document.getElementById("scheduleList");
       list.innerHTML = "";
-      weeklySchedule[dayIdx].forEach((item, index) => {
-        list.innerHTML += `<li>
-          <span>${item}</span>
-          <button class="add-btn" onclick="completeScheduleTask(${dayIdx}, ${index})">✓ Concluir</button>
-        </li>`;
-      });
+      
+      if (!weeklySchedule[dayIdx] || weeklySchedule[dayIdx].length === 0) {
+        list.innerHTML = `<li style="color:#2ed573;">Todos os blocos de hoje foram concluídos! 🎉</li>`;
+      } else {
+        weeklySchedule[dayIdx].forEach((item, index) => {
+          list.innerHTML += `<li>
+            <span style="font-size:0.75rem;">${item}</span>
+            <div style="display:flex; gap:4px;">
+              <button class="add-btn" style="background:#2ed573; padding:4px 6px;" onclick="startScheduleTask('${item}')">⏱️</button>
+              <button class="add-btn" style="padding:4px 6px;" onclick="completeScheduleTask(${dayIdx}, ${index})">✓ (+50 XP)</button>
+            </div>
+          </li>`;
+        });
+      }
 
       renderPending();
     }
 
+    function startScheduleTask(subjectName) {
+      currentStudyingSubject = subjectName;
+      document.getElementById("activeSubjectLabel").textContent = `Estudando: ${subjectName}`;
+      startTimer();
+    }
+
     function completeScheduleTask(dayIdx, taskIdx) {
       addXP(50);
+      reduceStress(10);
+      AUDIO_SUCESSO.play();
       weeklySchedule[dayIdx].splice(taskIdx, 1);
+      localStorage.setItem("weeklySchedule", JSON.stringify(weeklySchedule));
       initSchedule();
+      alert("🎉 Bloco do Cronograma Concluído! +50 XP adicionados!");
     }
 
     function renderPending() {
@@ -559,18 +581,19 @@
       pendingTasks.forEach((task, idx) => {
         list.innerHTML += `<li>
           <span>${task}</span>
-          <button class="add-btn" onclick="clearPending(${idx})">✓</button>
+          <button class="add-btn" onclick="clearPending(${idx})">✓ (+30 XP)</button>
         </li>`;
       });
     }
 
     function clearPending(idx) {
+      addXP(30);
       pendingTasks.splice(idx, 1);
       localStorage.setItem("pendingTasks", JSON.stringify(pendingTasks));
       renderPending();
     }
 
-    // Lógica do Ranking Dinâmico e Boost dos Rivais
+    // Ranking Dinâmico e Boost dos Rivais
     function renderRanking() {
       const userObj = competitors.find(c => c.isUser);
       userObj.level = userLevel;
@@ -665,9 +688,11 @@
       const dayIdx = new Date().getDay();
       const todayList = document.getElementById("todayChaptersList");
       todayList.innerHTML = "";
-      weeklySchedule[dayIdx].forEach(item => {
-        todayList.innerHTML += `<li>📖 Meta de Cap. para: <strong>${item}</strong></li>`;
-      });
+      if (weeklySchedule[dayIdx]) {
+        weeklySchedule[dayIdx].forEach(item => {
+          todayList.innerHTML += `<li>📖 Meta de Cap. para: <strong>${item}</strong></li>`;
+        });
+      }
     }
 
     function changeCap(sub, delta) {
@@ -678,8 +703,9 @@
       renderChaptersTab();
     }
 
-    // Cronômetro Adaptativo
+    // Cronômetro
     function startTimer() {
+      if (timerInterval) return;
       document.getElementById("selectTimerDuration").disabled = true;
       document.getElementById("btnStart").style.display = "none";
       document.getElementById("btnPause").style.display = "block";
@@ -713,10 +739,10 @@
       clearInterval(timerInterval);
       AUDIO_SUCESSO.play();
       
-      // XP Proporcional ao Tempo Escolhido
       const gainedXP = Math.floor(selectedMinutes * 2); 
       addXP(gainedXP);
       reduceStress(20);
+      
       alert(`✨ Bloco de ${selectedMinutes} min concluído com sucesso! +${gainedXP} XP!`);
       resetTimer();
     }
@@ -725,12 +751,11 @@
       clearInterval(timerInterval);
       AUDIO_BRONCA.play();
       
-      // Estresse Proporcional
       const addedStress = Math.floor(selectedMinutes * 0.5);
       addStress(addedStress);
       
       const dayIdx = new Date().getDay();
-      if (weeklySchedule[dayIdx].length > 0) {
+      if (weeklySchedule[dayIdx] && weeklySchedule[dayIdx].length > 0) {
         pendingTasks.push(weeklySchedule[dayIdx][0]);
         localStorage.setItem("pendingTasks", JSON.stringify(pendingTasks));
         renderPending();
@@ -745,8 +770,10 @@
       document.getElementById("btnPause").style.display = "none";
       document.getElementById("btnFinish").style.display = "none";
       document.getElementById("btnCancel").style.display = "none";
+      document.getElementById("activeSubjectLabel").textContent = "";
       timerInterval = null;
       isPaused = false;
+      currentStudyingSubject = "";
       timeLeft = selectedMinutes * 60;
       updateDisplay();
     }
