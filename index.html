@@ -101,7 +101,7 @@
       justify-content: center;
     }
 
-    .timer { font-size: 2.5rem; font-weight: bold; color: #00adb5; margin-bottom: 10px; }
+    .timer { font-size: 2.5rem; font-weight: bold; color: #00adb5; margin-bottom: 6px; }
 
     .box-section {
       background: #222226;
@@ -240,6 +240,18 @@
     </div>
     <div id="speech" class="speech-bubble">O conhecimento é a sua maior arma no RPG da vida!</div>
 
+    <!-- Seletor de Temporizador -->
+    <div class="custom-row" style="margin-bottom: 8px;">
+      <label>⏱️ Tempo de Foco:</label>
+      <select id="selectTimerDuration" onchange="changeTimerDuration(this.value)">
+        <option value="15">15 Minutos (Rápido)</option>
+        <option value="25">25 Minutos (Pomodoro)</option>
+        <option value="30">30 Minutos (Médio)</option>
+        <option value="50" selected>50 Minutos (Padrão)</option>
+        <option value="90">90 Minutos (Hardcore)</option>
+      </select>
+    </div>
+
     <!-- Timer -->
     <div id="timer" class="timer">50:00</div>
 
@@ -294,7 +306,7 @@
       </div>
     </div>
 
-    <!-- ABA 2: RANKING DINÂMICO & FOTOS (NOVO!) -->
+    <!-- ABA 2: RANKING DINÂMICO & FOTOS -->
     <div id="tab-ranking" class="tab-content">
       <div class="box-section">
         <div class="box-title">🏆 Tabela de Classificação RPG:</div>
@@ -417,8 +429,8 @@
     const AUDIO_SUCESSO = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
 
     // Estados
-    let selectedMinutes = 50;
-    let timeLeft = 50 * 60;
+    let selectedMinutes = parseInt(localStorage.getItem("selectedMinutes")) || 50;
+    let timeLeft = selectedMinutes * 60;
     let timerInterval = null;
     let isPaused = false;
 
@@ -480,6 +492,8 @@
     // Inicialização
     changeTheme(currentTheme);
     document.getElementById("selectTheme").value = currentTheme;
+    document.getElementById("selectTimerDuration").value = selectedMinutes;
+    updateDisplay();
     initSchedule();
     updateUI();
     renderRanking();
@@ -490,6 +504,14 @@
 
     let radarChartInstance = null;
     initRadarChart();
+
+    function changeTimerDuration(val) {
+      if (timerInterval) return; // Não troca se o temporizador estiver rodando
+      selectedMinutes = parseInt(val);
+      localStorage.setItem("selectedMinutes", selectedMinutes);
+      timeLeft = selectedMinutes * 60;
+      updateDisplay();
+    }
 
     function changeTheme(themeClass) {
       document.body.className = themeClass;
@@ -550,19 +572,15 @@
 
     // Lógica do Ranking Dinâmico e Boost dos Rivais
     function renderRanking() {
-      // Atualiza os dados do jogador no array
       const userObj = competitors.find(c => c.isUser);
       userObj.level = userLevel;
       userObj.xp = (userLevel * 100) + userXP;
 
-      // Ordena do maior para o menor XP total
       competitors.sort((a, b) => b.xp - a.xp);
 
-      // Verifica se o Usuário é o Top 1
       if (competitors[0].isUser) {
         alert("👑 INCRÍVEL! Você alcançou o Top 1! Os seus rivais treinaram pesado, subiram de nível e ultrapassaram você!");
         
-        // Efeito de Boost: Todos os rivais ganham XP massivo para ficar acima do jogador
         competitors.forEach(c => {
           if (!c.isUser) {
             c.level += Math.floor(Math.random() * 2) + 2;
@@ -570,7 +588,6 @@
           }
         });
 
-        // Reordena para jogar o usuário de volta para a última posição
         competitors.sort((a, b) => b.xp - a.xp);
       }
 
@@ -661,8 +678,9 @@
       renderChaptersTab();
     }
 
-    // Cronômetro
+    // Cronômetro Adaptativo
     function startTimer() {
+      document.getElementById("selectTimerDuration").disabled = true;
       document.getElementById("btnStart").style.display = "none";
       document.getElementById("btnPause").style.display = "block";
       document.getElementById("btnFinish").style.display = "block";
@@ -694,15 +712,22 @@
     function finishTimer() {
       clearInterval(timerInterval);
       AUDIO_SUCESSO.play();
-      addXP(100);
+      
+      // XP Proporcional ao Tempo Escolhido
+      const gainedXP = Math.floor(selectedMinutes * 2); 
+      addXP(gainedXP);
       reduceStress(20);
+      alert(`✨ Bloco de ${selectedMinutes} min concluído com sucesso! +${gainedXP} XP!`);
       resetTimer();
     }
 
     function cancelTimer() {
       clearInterval(timerInterval);
       AUDIO_BRONCA.play();
-      addStress(30);
+      
+      // Estresse Proporcional
+      const addedStress = Math.floor(selectedMinutes * 0.5);
+      addStress(addedStress);
       
       const dayIdx = new Date().getDay();
       if (weeklySchedule[dayIdx].length > 0) {
@@ -715,10 +740,13 @@
     }
 
     function resetTimer() {
+      document.getElementById("selectTimerDuration").disabled = false;
       document.getElementById("btnStart").style.display = "block";
       document.getElementById("btnPause").style.display = "none";
       document.getElementById("btnFinish").style.display = "none";
       document.getElementById("btnCancel").style.display = "none";
+      timerInterval = null;
+      isPaused = false;
       timeLeft = selectedMinutes * 60;
       updateDisplay();
     }
@@ -829,7 +857,7 @@
         userLevel++;
       }
       updateUI();
-      renderRanking(); // Atualiza posições no ranking
+      renderRanking();
     }
 
     function addStress(val) { stressLevel = Math.min(stressLevel + val, 100); updateUI(); }
