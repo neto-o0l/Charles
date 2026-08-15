@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Professor de Estudos - RPG Supremo</title>
 
+  <!-- PWA & Mobile Icons -->
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#00adb5">
   <meta name="mobile-web-app-capable" content="yes">
@@ -13,6 +14,7 @@
   <meta name="apple-mobile-web-app-title" content="Professor">
   <link rel="apple-touch-icon" href="Professor_neutro.png">
 
+  <!-- Chart.js para o Gráfico de Teia -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -86,12 +88,6 @@
       margin-bottom: 8px;
     }
     .mascot { max-height: 100%; max-width: 100%; border-radius: 10px; object-fit: contain; }
-    .shake { animation: shake 0.4s infinite; }
-    @keyframes shake {
-      0% { transform: translate(2px, 2px); }
-      50% { transform: translate(-3px, -2px); }
-      100% { transform: translate(1px, 2px); }
-    }
 
     .speech-bubble {
       background: #3e3e4a;
@@ -152,7 +148,7 @@
     }
     .add-btn { background: #00adb5; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-    ul.item-list { list-style: none; max-height: 140px; overflow-y: auto; }
+    ul.item-list { list-style: none; max-height: 160px; overflow-y: auto; }
     ul.item-list li {
       display: flex;
       justify-content: space-between;
@@ -169,6 +165,18 @@
     button.cancel { background: #e63946; }
     button.install { background: #2ed573; }
 
+    /* Ranking & Avatares */
+    .avatar-img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #00adb5;
+      margin-right: 8px;
+    }
+    .rank-user-row { background: #00adb5 !important; color: #fff; font-weight: bold; }
+
+    /* Sala de Aula Virtual */
     .classroom-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -180,9 +188,14 @@
       border-radius: 8px;
       padding: 8px;
       font-size: 0.7rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .desk.studying { border: 2px solid #2ed573; }
+    .desk .avatar-img { margin-right: 0; margin-bottom: 4px; }
 
+    /* Loja */
     .shop-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -207,25 +220,30 @@
 <body id="bgBody" class="theme-dark">
 
   <div class="card">
+    <!-- Topo Gamificado -->
     <div class="header-stats">
       <span class="streak-badge">🔥 <span id="streakCount">0</span>d</span>
       <span class="level-badge" id="levelDisplay">Nível 1</span>
       <span class="xp-badge">✨ <span id="xpDisplay">0</span> XP</span>
     </div>
 
+    <!-- Barra de XP e Estresse -->
     <div class="progress-bar-bg"><div id="xpBar" class="progress-bar-fill"></div></div>
     <div style="display:flex; justify-content: space-between; font-size: 0.75rem; color: #e63946; margin-bottom: 2px;">
       <span>Estresse: <span id="stressDisplay">0%</span></span>
     </div>
     <div class="progress-bar-bg"><div id="stressBar" class="progress-bar-fill stress-fill"></div></div>
 
+    <!-- Mascote & Falas -->
     <div class="mascot-container">
       <img id="mascot" class="mascot" src="Professor_neutro.png" alt="Mascote">
     </div>
     <div id="speech" class="speech-bubble">O conhecimento é a sua maior arma no RPG da vida!</div>
 
+    <!-- Timer -->
     <div id="timer" class="timer">50:00</div>
 
+    <!-- Controles -->
     <div class="buttons" style="margin-bottom: 10px;">
       <button id="btnInstall" class="main-btn install" style="display: none;">📲 Instalar Aplicativo</button>
       <button id="btnStart" class="main-btn" onclick="startTimer()">Iniciar Bloco</button>
@@ -234,6 +252,7 @@
       <button id="btnCancel" class="main-btn cancel" onclick="cancelTimer()" style="display: none;">Desistir</button>
     </div>
 
+    <!-- Opções de Personalização de Fundo -->
     <div class="custom-row">
       <label>🎨 Tema do Fundo:</label>
       <select id="selectTheme" onchange="changeTheme(this.value)">
@@ -248,8 +267,10 @@
     </div>
   </div>
 
+  <!-- Abas de Navegação -->
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('cronograma')">📅 Cronograma</button>
+    <button class="tab-btn" onclick="switchTab('ranking')">👑 Ranking</button>
     <button class="tab-btn" onclick="switchTab('livros')">📖 Livros & Capítulos</button>
     <button class="tab-btn" onclick="switchTab('radar')">🕸️ Radar</button>
     <button class="tab-btn" onclick="switchTab('questoes')">📝 Questões</button>
@@ -258,8 +279,10 @@
     <button class="tab-btn" onclick="switchTab('saude')">💧 Treino & Água</button>
   </div>
 
+  <!-- Card Principal com os Conteúdos das Abas -->
   <div class="card">
     
+    <!-- ABA 1: CRONOGRAMA ADAPTATIVO -->
     <div id="tab-cronograma" class="tab-content active">
       <div class="box-section">
         <div class="box-title">📅 Blocos de Hoje (<span id="currentDayName"></span>):</div>
@@ -271,6 +294,33 @@
       </div>
     </div>
 
+    <!-- ABA 2: RANKING DINÂMICO & FOTOS (NOVO!) -->
+    <div id="tab-ranking" class="tab-content">
+      <div class="box-section">
+        <div class="box-title">🏆 Tabela de Classificação RPG:</div>
+        <ul id="rankingList" class="item-list"></ul>
+      </div>
+
+      <div class="box-section">
+        <div class="box-title">🖼️ Personalizar Fotos dos Rivais:</div>
+        <div class="input-group">
+          <select id="selectRivalToEdit">
+            <option value="0">Você (Jogador)</option>
+            <option value="1">Isagi</option>
+            <option value="2">Bachira</option>
+            <option value="3">Chigiri</option>
+            <option value="4">Nagi</option>
+            <option value="5">Barou</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <input type="text" id="avatarUrlInput" placeholder="Cole a URL da Imagem/Foto">
+          <button class="add-btn" onclick="saveAvatarUrl()">Salvar Foto</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 3: LIVROS & CAPÍTULOS POR MATÉRIA -->
     <div id="tab-livros" class="tab-content">
       <div class="box-section">
         <div class="box-title">📊 Progresso Geral dos Capítulos:</div>
@@ -292,6 +342,7 @@
       </div>
     </div>
 
+    <!-- ABA 4: RADAR DE CONHECIMENTO (GRÁFICO DE TEIA) -->
     <div id="tab-radar" class="tab-content">
       <div class="box-section">
         <div class="box-title">🕸️ Teia de Conhecimento:</div>
@@ -299,6 +350,7 @@
       </div>
     </div>
 
+    <!-- ABA 5: CONVERSOR DE QUESTÕES EM XP -->
     <div id="tab-questoes" class="tab-content">
       <div class="box-section">
         <div class="box-title">📝 Registrar Questões Resolvidas:</div>
@@ -324,6 +376,7 @@
       </div>
     </div>
 
+    <!-- ABA 6: LOJA DE 100 CONQUISTAS (TROCA XP) -->
     <div id="tab-loja" class="tab-content">
       <div class="box-section">
         <div class="box-title">🏆 Loja de Conquistas (Gaste XP):</div>
@@ -331,6 +384,7 @@
       </div>
     </div>
 
+    <!-- ABA 7: SALA DE AULA VIRTUAL -->
     <div id="tab-sala" class="tab-content">
       <div class="box-section">
         <div class="box-title">🏫 Colegas Estudando Agora:</div>
@@ -338,6 +392,7 @@
       </div>
     </div>
 
+    <!-- ABA 8: SAÚDE E HÁBITOS -->
     <div id="tab-saude" class="tab-content">
       <div class="box-section">
         <div class="box-title">💧 Hidratação Diária:</div>
@@ -374,7 +429,17 @@
     let waterConsumed = parseInt(localStorage.getItem("waterConsumed")) || 0;
     let currentTheme = localStorage.getItem("currentTheme") || "theme-dark";
 
-    // Estrutura de Capítulos de Cada Matéria
+    // Dados do Ranking e Rivais
+    let competitors = JSON.parse(localStorage.getItem("competitors")) || [
+      { id: 0, name: "Você (Jogador)", level: 1, xp: 0, isUser: true, avatar: "https://via.placeholder.com/150/00adb5/ffffff?text=Você" },
+      { id: 1, name: "Isagi", level: 2, xp: 180, isUser: false, avatar: "https://via.placeholder.com/150/3e3e4a/ffffff?text=Isagi" },
+      { id: 2, name: "Bachira", level: 2, xp: 140, isUser: false, avatar: "https://via.placeholder.com/150/3e3e4a/ffffff?text=Bachira" },
+      { id: 3, name: "Chigiri", level: 1, xp: 90, isUser: false, avatar: "https://via.placeholder.com/150/3e3e4a/ffffff?text=Chigiri" },
+      { id: 4, name: "Nagi", level: 3, xp: 250, isUser: false, avatar: "https://via.placeholder.com/150/3e3e4a/ffffff?text=Nagi" },
+      { id: 5, name: "Barou", level: 2, xp: 210, isUser: false, avatar: "https://via.placeholder.com/150/3e3e4a/ffffff?text=Barou" }
+    ];
+
+    // Capítulos das Matérias
     let subjectChapters = JSON.parse(localStorage.getItem("subjectChapters")) || {
       "TQM (Matemática Fund.)": { done: 0, total: 46 },
       "TQM (Matemática Médio)": { done: 0, total: 20 },
@@ -390,37 +455,34 @@
       "Filosofia": { done: 0, total: 14 }
     };
 
-    // Conhecimento por Matéria para o Gráfico de Teia (0 a 100)
     let knowledgeStats = JSON.parse(localStorage.getItem("knowledgeStats")) || {
       "Matemática": 0, "Física": 0, "Química": 0, "Português": 0,
       "Biologia": 0, "História": 0, "Geografia": 0, "Redação": 0,
       "Inglês": 0, "Sociologia": 0, "Filosofia": 0
     };
 
-    // Cronograma Semanal Definido
     const weeklySchedule = {
-      1: ["Matemática (50m)", "Física (50m)", "Língua Portuguesa (50m)", "Matemática (50m)", "Química (50m)"], // Seg
-      2: ["Matemática (50m)", "Física (50m)", "História (50m)", "Matemática (50m)", "Geografia (50m)"], // Ter
-      3: ["Redação (50m)", "Redação Prática (50m)", "Biologia (50m)", "Língua Portuguesa (50m)", "Inglês (50m)"], // Qua
-      4: ["Matemática (50m)", "Física (50m)", "Química (50m)", "História (50m)", "Geografia (50m)"], // Qui
-      5: ["Matemática (50m)", "Química (50m)", "Biologia (50m)", "Inglês (50m)", "Sociologia (25m)", "Filosofia (25m)"], // Sex
-      6: ["Simulado (1h 30m)", "Correção do Simulado (1h)"], // Sáb
-      0: ["Descanso Ativo / Leitura Leve"] // Dom
+      1: ["Matemática (50m)", "Física (50m)", "Língua Portuguesa (50m)", "Matemática (50m)", "Química (50m)"],
+      2: ["Matemática (50m)", "Física (50m)", "História (50m)", "Matemática (50m)", "Geografia (50m)"],
+      3: ["Redação (50m)", "Redação Prática (50m)", "Biologia (50m)", "Língua Portuguesa (50m)", "Inglês (50m)"],
+      4: ["Matemática (50m)", "Física (50m)", "Química (50m)", "História (50m)", "Geografia (50m)"],
+      5: ["Matemática (50m)", "Química (50m)", "Biologia (50m)", "Inglês (50m)", "Sociologia (25m)", "Filosofia (25m)"],
+      6: ["Simulado (1h 30m)", "Correção do Simulado (1h)"],
+      0: ["Descanso Ativo / Leitura Leve"]
     };
 
     let pendingTasks = JSON.parse(localStorage.getItem("pendingTasks")) || [];
     let workouts = JSON.parse(localStorage.getItem("workouts")) || [];
     let unlockedAchievements = JSON.parse(localStorage.getItem("unlockedAchievements")) || [];
 
-    // Elementos DOM
     const timerEl = document.getElementById("timer");
-    const mascotImg = document.getElementById("mascot");
 
     // Inicialização
     changeTheme(currentTheme);
     document.getElementById("selectTheme").value = currentTheme;
     initSchedule();
     updateUI();
+    renderRanking();
     renderClassroom();
     renderShop();
     renderWorkouts();
@@ -486,7 +548,76 @@
       renderPending();
     }
 
-    // Lógica da Aba Livros e Capítulos
+    // Lógica do Ranking Dinâmico e Boost dos Rivais
+    function renderRanking() {
+      // Atualiza os dados do jogador no array
+      const userObj = competitors.find(c => c.isUser);
+      userObj.level = userLevel;
+      userObj.xp = (userLevel * 100) + userXP;
+
+      // Ordena do maior para o menor XP total
+      competitors.sort((a, b) => b.xp - a.xp);
+
+      // Verifica se o Usuário é o Top 1
+      if (competitors[0].isUser) {
+        alert("👑 INCRÍVEL! Você alcançou o Top 1! Os seus rivais treinaram pesado, subiram de nível e ultrapassaram você!");
+        
+        // Efeito de Boost: Todos os rivais ganham XP massivo para ficar acima do jogador
+        competitors.forEach(c => {
+          if (!c.isUser) {
+            c.level += Math.floor(Math.random() * 2) + 2;
+            c.xp = userObj.xp + Math.floor(Math.random() * 200) + 150;
+          }
+        });
+
+        // Reordena para jogar o usuário de volta para a última posição
+        competitors.sort((a, b) => b.xp - a.xp);
+      }
+
+      localStorage.setItem("competitors", JSON.stringify(competitors));
+
+      const rankList = document.getElementById("rankingList");
+      rankList.innerHTML = "";
+
+      competitors.forEach((comp, idx) => {
+        rankList.innerHTML += `<li class="${comp.isUser ? 'rank-user-row' : ''}">
+          <div style="display:flex; align-items:center;">
+            <img src="${comp.avatar}" class="avatar-img" alt="${comp.name}">
+            <span><strong>#${idx + 1}</strong> ${comp.name} (Niv. ${comp.level})</span>
+          </div>
+          <span>${comp.xp} XP</span>
+        </li>`;
+      });
+
+      renderClassroom();
+    }
+
+    function saveAvatarUrl() {
+      const selectIdx = parseInt(document.getElementById("selectRivalToEdit").value);
+      const url = document.getElementById("avatarUrlInput").value.trim();
+      if (!url) return;
+
+      competitors[selectIdx].avatar = url;
+      localStorage.setItem("competitors", JSON.stringify(competitors));
+      document.getElementById("avatarUrlInput").value = "";
+      renderRanking();
+      alert("Foto/Avatar atualizado com sucesso!");
+    }
+
+    // Sala Virtual
+    function renderClassroom() {
+      const grid = document.getElementById("classroomGrid");
+      grid.innerHTML = "";
+      competitors.filter(c => !c.isUser).forEach(comp => {
+        grid.innerHTML += `<div class="desk studying">
+          <img src="${comp.avatar}" class="avatar-img" alt="${comp.name}">
+          <span>👤 ${comp.name}</span>
+          <small style="color:#2ed573;">Estudando...</small>
+        </div>`;
+      });
+    }
+
+    // Aba Livros e Capítulos
     function renderChaptersTab() {
       let totalDone = 0;
       let totalCap = 0;
@@ -514,7 +645,6 @@
       document.getElementById("capPercent").textContent = `${percent}%`;
       document.getElementById("capProgressBar").style.width = `${percent}%`;
 
-      // Atualiza capítulos do dia baseado nas matérias do cronograma de hoje
       const dayIdx = new Date().getDay();
       const todayList = document.getElementById("todayChaptersList");
       todayList.innerHTML = "";
@@ -526,7 +656,7 @@
     function changeCap(sub, delta) {
       const item = subjectChapters[sub];
       item.done = Math.max(0, Math.min(item.done + delta, item.total));
-      if (delta > 0) addXP(30); // Ganha 30 XP ao concluir 1 capítulo
+      if (delta > 0) addXP(30);
       localStorage.setItem("subjectChapters", JSON.stringify(subjectChapters));
       renderChaptersTab();
     }
@@ -660,19 +790,6 @@
       }
     }
 
-    // Sala Virtual
-    function renderClassroom() {
-      const grid = document.getElementById("classroomGrid");
-      const classmates = ["Isagi", "Bachira", "Chigiri", "Nagi", "Rin", "Barou"];
-      grid.innerHTML = "";
-      classmates.forEach(name => {
-        grid.innerHTML += `<div class="desk studying">
-          <span>👤 ${name}</span><br>
-          <small style="color:#2ed573;">Estudando...</small>
-        </div>`;
-      });
-    }
-
     // Hábitos e Saúde
     function addWater(amount) {
       waterConsumed = Math.min(waterConsumed + amount, 3000);
@@ -712,6 +829,7 @@
         userLevel++;
       }
       updateUI();
+      renderRanking(); // Atualiza posições no ranking
     }
 
     function addStress(val) { stressLevel = Math.min(stressLevel + val, 100); updateUI(); }
@@ -730,10 +848,10 @@
       localStorage.setItem("stressLevel", stressLevel);
     }
 
-    // Register Service Worker for PWA
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("sw.js");
     }
   </script>
 </body>
 </html>
+
