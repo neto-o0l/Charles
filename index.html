@@ -47,7 +47,7 @@
       justify-content: center;
       align-items: center;
       padding: 20px;
-      transition: opacity 1s ease, visibility 1s ease;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
     }
 
     .splash-text {
@@ -56,13 +56,21 @@
       color: #00adb5;
       text-shadow: 0 0 15px rgba(0, 173, 181, 0.6);
       opacity: 0;
-      transition: opacity 0.8s ease-in-out;
       text-align: center;
       max-width: 80%;
     }
 
-    .splash-text.active {
-      opacity: 1;
+    /* Animação para piscar a frase */
+    @keyframes blinkEffect {
+      0% { opacity: 0; }
+      25% { opacity: 1; }
+      50% { opacity: 0.2; }
+      75% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .splash-text.blink {
+      animation: blinkEffect 2.5s ease-in-out forwards;
     }
 
     /* Cores de Fundo Personalizadas */
@@ -463,7 +471,7 @@
   </div>
 
   <script>
-    // Configuração do Splash Screen (Frases & Áudios Opcionais)
+    // Configuração do Splash Screen (Escolha Aleatória de 1 Frase com Piscar)
     const splashQuotes = [
       { text: "Olá diamantes brutos com talento", audio: "frase1.mp3" },
       { text: "A ciência é realmente muito elegante", audio: "frase2.mp3" },
@@ -474,31 +482,25 @@
     function runSplashScreen() {
       const splashScreen = document.getElementById("splashScreen");
       const splashText = document.getElementById("splashText");
-      let index = 0;
 
-      function showNextQuote() {
-        if (index < splashQuotes.length) {
-          splashText.textContent = `"${splashQuotes[index].text}"`;
-          splashText.classList.add("active");
+      // Seleção Aleatória (25% de chance para cada uma das 4 frases)
+      const randomIndex = Math.floor(Math.random() * splashQuotes.length);
+      const chosenQuote = splashQuotes[randomIndex];
 
-          // Toca o áudio da frase correspondente, caso o arquivo exista na pasta
-          try {
-            const voiceAudio = new Audio(splashQuotes[index].audio);
-            voiceAudio.play().catch(() => {});
-          } catch(e) {}
+      splashText.textContent = `"${chosenQuote.text}"`;
+      splashText.classList.add("blink");
 
-          setTimeout(() => {
-            splashText.classList.remove("active");
-            index++;
-            setTimeout(showNextQuote, 500);
-          }, 2000);
-        } else {
-          splashScreen.style.opacity = "0";
-          splashScreen.style.visibility = "hidden";
-        }
-      }
+      // Toca o áudio da frase sorteada (se disponível)
+      try {
+        const voiceAudio = new Audio(chosenQuote.audio);
+        voiceAudio.play().catch(() => {});
+      } catch(e) {}
 
-      showNextQuote();
+      // Esconde a tela de abertura após a animação de piscar (2.5 segundos)
+      setTimeout(() => {
+        splashScreen.style.opacity = "0";
+        splashScreen.style.visibility = "hidden";
+      }, 2500);
     }
 
     window.addEventListener("DOMContentLoaded", runSplashScreen);
