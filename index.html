@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Professor de Estudos - Fase Final RPG</title>
-  
+  <title>Professor de Estudos - RPG Supremo</title>
+
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#00adb5">
-
   <meta name="mobile-web-app-capable" content="yes">
-
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Professor">
   <link rel="apple-touch-icon" href="Professor_neutro.png">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,11 +25,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       min-height: 100vh;
       padding: 15px;
       text-align: center;
-      transition: background-color 0.4s ease;
     }
 
     body.theme-dark { background-color: #1a1a1d; }
@@ -42,8 +40,9 @@
       border-radius: 20px;
       padding: 18px;
       width: 100%;
-      max-width: 380px;
+      max-width: 420px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      margin-bottom: 15px;
     }
 
     .header-stats {
@@ -59,11 +58,12 @@
     }
     .streak-badge { color: #ff9f43; }
     .level-badge { color: #00adb5; }
+    .xp-badge { color: #2ed573; }
 
     .progress-bar-bg {
       background: #3e3e4a;
       border-radius: 8px;
-      height: 6px;
+      height: 8px;
       width: 100%;
       overflow: hidden;
       margin-bottom: 8px;
@@ -72,7 +72,7 @@
     .stress-fill { background: #e63946 !important; }
 
     .mascot-container {
-      height: 150px;
+      height: 140px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -81,12 +81,9 @@
     .mascot { max-height: 100%; max-width: 100%; border-radius: 10px; object-fit: contain; }
     .shake { animation: shake 0.4s infinite; }
     @keyframes shake {
-      0% { transform: translate(2px, 2px) rotate(0deg); }
-      20% { transform: translate(-3px, 0px) rotate(-2deg); }
-      40% { transform: translate(3px, 2px) rotate(2deg); }
-      60% { transform: translate(-3px, 1px) rotate(0deg); }
-      80% { transform: translate(3px, 1px) rotate(-2deg); }
-      100% { transform: translate(1px, -2px) rotate(0deg); }
+      0% { transform: translate(2px, 2px); }
+      50% { transform: translate(-3px, -2px); }
+      100% { transform: translate(1px, 2px); }
     }
 
     .speech-bubble {
@@ -99,250 +96,336 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      line-height: 1.2;
     }
 
     .timer { font-size: 2.5rem; font-weight: bold; color: #00adb5; margin-bottom: 10px; }
 
-    .time-selector { display: flex; gap: 6px; justify-content: center; margin-bottom: 10px; }
-    .time-btn { background: #3e3e4a; color: #fff; border: none; padding: 6px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
-    .time-btn.active { background: #00adb5; }
-
     .box-section {
       background: #222226;
       border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
       text-align: left;
       font-size: 0.8rem;
     }
-    .box-title { font-weight: bold; color: #00adb5; margin-bottom: 6px; display: flex; justify-content: space-between; }
+    .box-title { font-weight: bold; color: #00adb5; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      margin-top: 4px;
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      margin-bottom: 12px;
+      width: 100%;
+      max-width: 420px;
     }
-    .stat-card {
-      background: #2d2d34;
-      padding: 6px;
-      border-radius: 6px;
-      text-align: center;
+    .tab-btn {
+      background: #222226;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      white-space: nowrap;
     }
-    .stat-card strong { color: #00adb5; display: block; font-size: 0.9rem; }
+    .tab-btn.active { background: #00adb5; font-weight: bold; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     .input-group { display: flex; gap: 6px; margin-bottom: 6px; }
-    input[type="text"], input[type="date"] {
-      flex: 1;
+    input, select {
       background: #3e3e4a;
       border: none;
       color: #fff;
-      padding: 6px;
+      padding: 6px 8px;
       border-radius: 6px;
       font-size: 0.75rem;
+      width: 100%;
     }
-    .add-btn { background: #00adb5; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .add-btn { background: #00adb5; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-    ul.item-list { list-style: none; max-height: 80px; overflow-y: auto; }
+    ul.item-list { list-style: none; max-height: 120px; overflow-y: auto; }
     ul.item-list li {
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: #2d2d34;
-      padding: 5px 8px;
+      padding: 6px 8px;
       border-radius: 6px;
       margin-bottom: 4px;
     }
-    .remove-item { color: #e63946; cursor: pointer; font-weight: bold; margin-left: 8px; }
 
-    .buttons { display: flex; gap: 8px; flex-direction: column; }
-    button.main-btn { background: #00adb5; color: white; border: none; padding: 10px; border-radius: 10px; font-size: 0.95rem; font-weight: bold; cursor: pointer; }
+    .buttons { display: flex; gap: 6px; flex-direction: column; }
+    button.main-btn { background: #00adb5; color: white; border: none; padding: 10px; border-radius: 10px; font-size: 0.9rem; font-weight: bold; cursor: pointer; }
     button.pause { background: #f39c12; }
     button.cancel { background: #e63946; }
-    button.install { background: #2ed573; margin-bottom: 4px; }
+    button.install { background: #2ed573; }
 
-    .custom-row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.75rem; }
-    select { background: #3e3e4a; color: #fff; border: none; padding: 4px 6px; border-radius: 6px; }
+    /* Sala de Aula Virtual */
+    .classroom-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      text-align: center;
+    }
+    .desk {
+      background: #3e3e4a;
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 0.7rem;
+    }
+    .desk.studying { border: 2px solid #2ed573; }
+
+    /* Loja de Conquistas */
+    .shop-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .shop-item {
+      background: #2d2d34;
+      padding: 8px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .buy-btn { background: #2ed573; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.7rem; }
+    .buy-btn:disabled { background: #555; cursor: not-allowed; }
   </style>
 </head>
 <body id="bgBody" class="theme-dark">
 
   <div class="card">
     <div class="header-stats">
-      <span class="streak-badge">🔥 <span id="streakCount">0</span> dias</span>
+      <span class="streak-badge">🔥 <span id="streakCount">0</span>d</span>
       <span class="level-badge" id="levelDisplay">Nível 1</span>
+      <span class="xp-badge">✨ <span id="xpDisplay">0</span> XP</span>
     </div>
 
     <div class="progress-bar-bg"><div id="xpBar" class="progress-bar-fill"></div></div>
-    <div class="custom-row" style="color: #e63946; margin-bottom: 2px;">
-      <span>Estresse do Professor:</span>
-      <span id="stressDisplay">0%</span>
+    <div style="display:flex; justify-between; font-size: 0.75rem; color: #e63946; margin-bottom: 2px;">
+      <span>Estresse: <span id="stressDisplay">0%</span></span>
     </div>
     <div class="progress-bar-bg"><div id="stressBar" class="progress-bar-fill stress-fill"></div></div>
 
     <div class="mascot-container">
       <img id="mascot" class="mascot" src="Professor_neutro.png" alt="Mascote">
     </div>
-    <div id="speech" class="speech-bubble">Seus rivais estão estudando. Qual será o seu próximo movimento?</div>
+    <div id="speech" class="speech-bubble">O conhecimento é a sua maior arma no RPG da vida!</div>
 
-    <div class="time-selector">
-      <button class="time-btn" onclick="selectTime(15, this)">15m</button>
-      <button class="time-btn active" onclick="selectTime(25, this)">25m</button>
-      <button class="time-btn" onclick="selectTime(50, this)">50m</button>
-      <button class="time-btn" onclick="selectTime(5, this)">5m Pausa</button>
-    </div>
-
-    <div id="timer" class="timer">25:00</div>
+    <div id="timer" class="timer">50:00</div>
 
     <div class="buttons" style="margin-bottom: 10px;">
       <button id="btnInstall" class="main-btn install" style="display: none;">📲 Instalar Aplicativo</button>
-      <button id="btnStart" class="main-btn" onclick="startTimer()">Iniciar Estudos</button>
+      <button id="btnStart" class="main-btn" onclick="startTimer()">Iniciar Bloco</button>
       <button id="btnPause" class="main-btn pause" onclick="pauseTimer()" style="display: none;">Pausar</button>
-      <button id="btnFinish" class="main-btn" onclick="finishTimer()" style="display: none;">Concluir Tarefa</button>
-      <button id="btnCancel" class="main-btn cancel" onclick="cancelTimer()" style="display: none;">Desistir / Cancelar</button>
-    </div>
-
-    <div class="box-section">
-      <div class="box-title">🏆 Ranking de Rivais (XP Total):</div>
-      <ul id="rivalsList" class="item-list"></ul>
-    </div>
-
-    <div class="box-section">
-      <div class="box-title">📊 Tempo Estudado:</div>
-      <div class="stats-grid">
-        <div class="stat-card">Hoje: <strong id="timeDay">0h 0m</strong></div>
-        <div class="stat-card">Semana: <strong id="timeWeek">0h 0m</strong></div>
-        <div class="stat-card">Mês: <strong id="timeMonth">0h 0m</strong></div>
-        <div class="stat-card">Ano: <strong id="timeYear">0h 0m</strong></div>
-      </div>
-    </div>
-
-    <div class="box-section">
-      <div class="box-title">📚 Assuntos de Hoje:</div>
-      <div class="input-group">
-        <input type="text" id="subjectInput" placeholder="Ex: Matemática - Geometria">
-        <button class="add-btn" onclick="addSubject()">+</button>
-      </div>
-      <ul id="subjectList" class="item-list"></ul>
-    </div>
-
-    <div class="box-section">
-      <div class="box-title">🎯 Próximo Simulado:</div>
-      <div class="input-group">
-        <input type="text" id="simTitle" placeholder="Ex: ENEM">
-        <input type="date" id="simDate">
-        <button class="add-btn" onclick="addSimulado()">+</button>
-      </div>
-      <ul id="simList" class="item-list"></ul>
-    </div>
-
-    <div class="custom-row">
-      <label>🎭 Avatar:</label>
-      <select id="selectAvatar" onchange="changeAvatar(this.value)">
-        <option value="Professor_neutro.png">Padrão</option>
-        <option value="Professor_estudando.png">Modo Foco</option>
-        <option value="Professor_feliz.png">Modo Feliz</option>
-        <option value="Professor_bravo.png">Modo Bravo</option>
-      </select>
-    </div>
-    <div class="custom-row">
-      <label>🎨 Cenário:</label>
-      <select id="selectTheme" onchange="changeTheme(this.value)">
-        <option value="theme-dark">Escuro</option>
-        <option value="theme-dojo">Dojo</option>
-        <option value="theme-cyber">Cyber</option>
-        <option value="theme-nature">Florestal</option>
-      </select>
+      <button id="btnFinish" class="main-btn" onclick="finishTimer()" style="display: none;">Concluir Bloco</button>
+      <button id="btnCancel" class="main-btn cancel" onclick="cancelTimer()" style="display: none;">Desistir</button>
     </div>
   </div>
 
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('cronograma')">📅 Cronograma</button>
+    <button class="tab-btn" onclick="switchTab('radar')">🕸️ Radar</button>
+    <button class="tab-btn" onclick="switchTab('questoes')">📝 Questões</button>
+    <button class="tab-btn" onclick="switchTab('loja')">🏆 Loja (100)</button>
+    <button class="tab-btn" onclick="switchTab('sala')">🏫 Sala Virtual</button>
+    <button class="tab-btn" onclick="switchTab('saude')">💧 Treino & Água</button>
+  </div>
+
+  <div class="card">
+    
+    <div id="tab-cronograma" class="tab-content active">
+      <div class="box-section">
+        <div class="box-title">📅 Blocos de Hoje (<span id="currentDayName"></span>):</div>
+        <ul id="scheduleList" class="item-list"></ul>
+      </div>
+      <div class="box-section">
+        <div class="box-title">⚠️ Atrasados / Pêndencias:</div>
+        <ul id="pendingList" class="item-list"></ul>
+      </div>
+    </div>
+
+    <div id="tab-radar" class="tab-content">
+      <div class="box-section">
+        <div class="box-title">🕸️ Teia de Conhecimento:</div>
+        <canvas id="radarChart" width="300" height="300"></canvas>
+      </div>
+    </div>
+
+    <div id="tab-questoes" class="tab-content">
+      <div class="box-section">
+        <div class="box-title">📝 Registrar Questões Resolvidas:</div>
+        <div class="input-group">
+          <select id="questMat">
+            <option value="Matemática">Matemática</option>
+            <option value="Física">Física</option>
+            <option value="Química">Química</option>
+            <option value="Português">Língua Portuguesa</option>
+            <option value="Biologia">Biologia</option>
+            <option value="História">História</option>
+            <option value="Geografia">Geografia</option>
+            <option value="Redação">Redação</option>
+            <option value="Inglês">Inglês</option>
+            <option value="Sociologia">Sociologia</option>
+            <option value="Filosofia">Filosofia</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <input type="number" id="questCount" placeholder="Qtd. de Questões Feitas">
+          <button class="add-btn" onclick="submitQuestions()">Converter em XP</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-loja" class="tab-content">
+      <div class="box-section">
+        <div class="box-title">🏆 Loja de Conquistas (Gaste XP):</div>
+        <div class="shop-grid" id="shopContainer"></div>
+      </div>
+    </div>
+
+    <div id="tab-sala" class="tab-content">
+      <div class="box-section">
+        <div class="box-title">🏫 Colegas Estudando Agora:</div>
+        <div class="classroom-grid" id="classroomGrid"></div>
+      </div>
+    </div>
+
+    <div id="tab-saude" class="tab-content">
+      <div class="box-section">
+        <div class="box-title">💧 Hidratação Diária:</div>
+        <p>Consumido: <strong id="waterCount">0</strong> / 2000 ml</p>
+        <button class="main-btn" style="margin-top:6px; background:#00adb5;" onclick="addWater(250)">+ 250ml de Água</button>
+      </div>
+      <div class="box-section">
+        <div class="box-title">🏋️ Rotina de Treino:</div>
+        <div class="input-group">
+          <input type="text" id="workoutInput" placeholder="Ex: Flexões / Corrida">
+          <button class="add-btn" onclick="addWorkout()">Add</button>
+        </div>
+        <ul id="workoutList" class="item-list"></ul>
+      </div>
+    </div>
+
+  </div>
+
   <script>
+    // Audios
     const AUDIO_BRONCA = new Audio("https://assets.mixkit.co/active_storage/sfx/2874/2874-preview.mp3");
     const AUDIO_SUCESSO = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
 
-    let selectedMinutes = 25;
-    let timeLeft = 25 * 60;
+    // Estados
+    let selectedMinutes = 50;
+    let timeLeft = 50 * 60;
     let timerInterval = null;
     let isPaused = false;
 
     let userLevel = parseInt(localStorage.getItem("userLevel")) || 1;
     let userXP = parseInt(localStorage.getItem("userXP")) || 0;
-    let totalMinutesStudied = parseInt(localStorage.getItem("totalMinutesStudied")) || 0;
     let stressLevel = parseInt(localStorage.getItem("stressLevel")) || 0;
     let streakCount = parseInt(localStorage.getItem("streakCount")) || 0;
-    let lastStudyDate = localStorage.getItem("lastStudyDate") || "";
-    let currentAvatar = localStorage.getItem("currentAvatar") || "Professor_neutro.png";
+    let waterConsumed = parseInt(localStorage.getItem("waterConsumed")) || 0;
 
-    let subjects = JSON.parse(localStorage.getItem("subjects")) || [];
-    let simulados = JSON.parse(localStorage.getItem("simulados")) || [];
+    // Conhecimento por Matéria para o Gráfico de Teia (0 a 100)
+    let knowledgeStats = JSON.parse(localStorage.getItem("knowledgeStats")) || {
+      "Matemática": 0, "Física": 0, "Química": 0, "Português": 0,
+      "Biologia": 0, "História": 0, "Geografia": 0, "Redação": 0,
+      "Inglês": 0, "Sociologia": 0, "Filosofia": 0
+    };
 
-    // Rivais Dinâmicos
-    let rivals = JSON.parse(localStorage.getItem("rivals")) || [
-      { name: "Rin", xp: 1200 },
-      { name: "Barou", xp: 800 },
-      { name: "Nagi", xp: 450 }
-    ];
+    // Cronograma Semanal Definido
+    const weeklySchedule = {
+      1: ["Matemática (50m)", "Física (50m)", "Língua Portuguesa (50m)", "Matemática (50m)", "Química (50m)"], // Seg
+      2: ["Matemática (50m)", "Física (50m)", "História (50m)", "Matemática (50m)", "Geografia (50m)"], // Ter
+      3: ["Redação (50m)", "Redação Prática (50m)", "Biologia (50m)", "Língua Portuguesa (50m)", "Inglês (50m)"], // Qua
+      4: ["Matemática (50m)", "Física (50m)", "Química (50m)", "História (50m)", "Geografia (50m)"], // Qui
+      5: ["Matemática (50m)", "Química (50m)", "Biologia (50m)", "Inglês (50m)", "Sociologia (25m)", "Filosofia (25m)"], // Sex
+      6: ["Simulado (1h 30m)", "Correção do Simulado (1h)"], // Sáb
+      0: ["Descanso Ativo / Leitura Leve"] // Dom
+    };
 
+    let pendingTasks = JSON.parse(localStorage.getItem("pendingTasks")) || [];
+    let workouts = JSON.parse(localStorage.getItem("workouts")) || [];
+    let unlockedAchievements = JSON.parse(localStorage.getItem("unlockedAchievements")) || [];
+
+    // Elementos DOM
+    const timerEl = document.getElementById("timer");
     const mascotImg = document.getElementById("mascot");
     const speechEl = document.getElementById("speech");
-    const timerEl = document.getElementById("timer");
-    const btnStart = document.getElementById("btnStart");
-    const btnPause = document.getElementById("btnPause");
-    const btnFinish = document.getElementById("btnFinish");
-    const btnCancel = document.getElementById("btnCancel");
 
     // Inicialização
-    mascotImg.src = currentAvatar;
-    document.getElementById("selectAvatar").value = currentAvatar;
-    checkStreak();
-    renderSubjects();
-    renderSimulados();
-    renderRivals();
-    updateTimeStats();
-    updateGamificationUI();
+    initSchedule();
+    updateUI();
+    renderClassroom();
+    renderShop();
+    renderWorkouts();
 
-    function selectTime(minutes, element) {
-      if (timerInterval) return;
-      selectedMinutes = minutes;
-      timeLeft = minutes * 60;
-      document.querySelectorAll(".time-btn").forEach(btn => btn.classList.remove("active"));
-      element.classList.add("active");
-      updateDisplay();
+    let radarChartInstance = null;
+    initRadarChart();
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+      
+      event.target.classList.add("active");
+      document.getElementById(`tab-${tabId}`).classList.add("active");
     }
 
-    function updateDisplay() {
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = timeLeft % 60;
-      timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    function initSchedule() {
+      const dayIdx = new Date().getDay();
+      const daysNames = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+      document.getElementById("currentDayName").textContent = daysNames[dayIdx];
+
+      const list = document.getElementById("scheduleList");
+      list.innerHTML = "";
+      weeklySchedule[dayIdx].forEach((item, index) => {
+        list.innerHTML += `<li>
+          <span>${item}</span>
+          <button class="add-btn" onclick="completeScheduleTask(${dayIdx}, ${index})">✓ Concluir</button>
+        </li>`;
+      });
+
+      renderPending();
     }
 
-    function setMascotState(stateImg, message, isAngry = false) {
-      mascotImg.src = stateImg;
-      speechEl.textContent = message;
-      if (isAngry || stressLevel >= 75) mascotImg.classList.add("shake");
-      else mascotImg.classList.remove("shake");
+    function completeScheduleTask(dayIdx, taskIdx) {
+      addXP(50);
+      weeklySchedule[dayIdx].splice(taskIdx, 1);
+      initSchedule();
     }
 
-    function changeAvatar(avatarSrc) {
-      currentAvatar = avatarSrc;
-      mascotImg.src = avatarSrc;
-      localStorage.setItem("currentAvatar", avatarSrc);
-    }
-
-    function startTimer() {
-      if (isPaused) {
-        isPaused = false;
-        btnPause.textContent = "Pausar";
-        setMascotState("Professor_estudando.png", "Voltando ao trabalho!");
-      } else {
-        setMascotState("Professor_estudando.png", "Foco total na missão!");
+    function renderPending() {
+      const list = document.getElementById("pendingList");
+      list.innerHTML = "";
+      if (pendingTasks.length === 0) {
+        list.innerHTML = `<li style="color:#2ed573;">Nenhuma pendência acumulada! 🎉</li>`;
+        return;
       }
+      pendingTasks.forEach((task, idx) => {
+        list.innerHTML += `<li>
+          <span>${task}</span>
+          <button class="add-btn" onclick="clearPending(${idx})">✓</button>
+        </li>`;
+      });
+    }
 
-      btnStart.style.display = "none";
-      btnPause.style.display = "block";
-      btnFinish.style.display = "block";
-      btnCancel.style.display = "block";
+    function clearPending(idx) {
+      pendingTasks.splice(idx, 1);
+      localStorage.setItem("pendingTasks", JSON.stringify(pendingTasks));
+      renderPending();
+    }
+
+    // Cronômetro
+    function startTimer() {
+      document.getElementById("btnStart").style.display = "none";
+      document.getElementById("btnPause").style.display = "block";
+      document.getElementById("btnFinish").style.display = "block";
+      document.getElementById("btnCancel").style.display = "block";
 
       timerInterval = setInterval(() => {
         if (!isPaused) {
@@ -356,238 +439,190 @@
       }, 1000);
     }
 
+    function updateDisplay() {
+      const m = Math.floor(timeLeft / 60);
+      const s = timeLeft % 60;
+      timerEl.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
     function pauseTimer() {
-      if (!isPaused) {
-        isPaused = true;
-        btnPause.textContent = "Retomar";
-        addStress(15);
-        setMascotState(currentAvatar, "Pausou? Seus rivais continuam estudando!");
-      } else {
-        startTimer();
-      }
+      isPaused = !isPaused;
+      document.getElementById("btnPause").textContent = isPaused ? "Retomar" : "Pausar";
     }
 
     function finishTimer() {
       clearInterval(timerInterval);
-      timerInterval = null;
       AUDIO_SUCESSO.play();
-      reduceStress(25);
-      
-      totalMinutesStudied += selectedMinutes;
-      updateStreakOnCompletion();
-      addXP(selectedMinutes * 2);
-      updateRivals();
-      
-      setMascotState("Professor_feliz.png", "Excelente! Você superou seus limites hoje!");
-      resetButtons();
+      addXP(100);
+      reduceStress(20);
+      resetTimer();
     }
 
     function cancelTimer() {
       clearInterval(timerInterval);
-      timerInterval = null;
-      isPaused = false;
       AUDIO_BRONCA.play();
-      addStress(40);
-      setMascotState("Professor_bravo.png", "DESISTIU?! Assim os rivais vão te ultrapassar!", true);
-      resetButtons();
-    }
-
-    // Sistema de Rivais Inteligentes
-    function updateRivals() {
-      rivals.forEach(r => {
-        r.xp += Math.floor(Math.random() * (selectedMinutes * 1.5));
-      });
-      renderRivals();
-    }
-
-    function renderRivals() {
-      const userTotalXP = (userLevel - 1) * 100 + userXP;
-      let rankingList = [...rivals, { name: "Você 🫵", xp: userTotalXP }];
-      rankingList.sort((a, b) => b.xp - a.xp);
-
-      const list = document.getElementById("rivalsList");
-      list.innerHTML = "";
-      rankingList.forEach((r, index) => {
-        const isUser = r.name.includes("Você");
-        list.innerHTML += `<li style="${isUser ? 'color: #00adb5; font-weight: bold;' : ''}">
-          <span>#${index + 1} ${r.name}</span>
-          <span>${r.xp} XP</span>
-        </li>`;
-      });
-      localStorage.setItem("rivals", JSON.stringify(rivals));
-    }
-
-    // Estatísticas de Tempo
-    function updateTimeStats() {
-      const hrs = Math.floor(totalMinutesStudied / 60);
-      const mins = totalMinutesStudied % 60;
+      addStress(30);
       
-      document.getElementById("timeDay").textContent = `${hrs}h ${mins}m`;
-      document.getElementById("timeWeek").textContent = `${hrs}h ${mins}m`;
-      document.getElementById("timeMonth").textContent = `${hrs}h ${mins}m`;
-      document.getElementById("timeYear").textContent = `${hrs}h ${mins}m`;
+      // Empurra o bloco atual para as pendências
+      const dayIdx = new Date().getDay();
+      if (weeklySchedule[dayIdx].length > 0) {
+        pendingTasks.push(weeklySchedule[dayIdx][0]);
+        localStorage.setItem("pendingTasks", JSON.stringify(pendingTasks));
+        renderPending();
+      }
 
-      localStorage.setItem("totalMinutesStudied", totalMinutesStudied);
+      resetTimer();
     }
 
-    // Streak
-    function checkStreak() {
-      const today = new Date().toDateString();
-      if (lastStudyDate) {
-        const lastDate = new Date(lastStudyDate);
-        const diffDays = Math.ceil(Math.abs(new Date(today) - lastDate) / (1000 * 60 * 60 * 24));
-        if (diffDays > 1) {
-          streakCount = 0;
-          localStorage.setItem("streakCount", 0);
+    function resetTimer() {
+      document.getElementById("btnStart").style.display = "block";
+      document.getElementById("btnPause").style.display = "none";
+      document.getElementById("btnFinish").style.display = "none";
+      document.getElementById("btnCancel").style.display = "none";
+      timeLeft = selectedMinutes * 60;
+      updateDisplay();
+    }
+
+    // Radar Chart
+    function initRadarChart() {
+      const ctx = document.getElementById('radarChart').getContext('2d');
+      radarChartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: Object.keys(knowledgeStats),
+          datasets: [{
+            label: 'Nível de Domínio (%)',
+            data: Object.values(knowledgeStats),
+            backgroundColor: 'rgba(0, 173, 181, 0.2)',
+            borderColor: '#00adb5',
+            pointBackgroundColor: '#2ed573'
+          }]
+        },
+        options: {
+          scales: { r: { min: 0, max: 100, ticks: { display: false } } }
         }
-      }
-      document.getElementById("streakCount").textContent = streakCount;
+      });
     }
 
-    function updateStreakOnCompletion() {
-      const today = new Date().toDateString();
-      if (lastStudyDate !== today) {
-        streakCount++;
-        lastStudyDate = today;
-        localStorage.setItem("streakCount", streakCount);
-        localStorage.setItem("lastStudyDate", lastStudyDate);
-      }
-      document.getElementById("streakCount").textContent = streakCount;
+    function submitQuestions() {
+      const subject = document.getElementById("questMat").value;
+      const count = parseInt(document.getElementById("questCount").value);
+      if (!count || count <= 0) return;
+
+      const gainedXP = count * 5; // 5 XP por questão
+      addXP(gainedXP);
+
+      knowledgeStats[subject] = Math.min(knowledgeStats[subject] + Math.ceil(count / 2), 100);
+      localStorage.setItem("knowledgeStats", JSON.stringify(knowledgeStats));
+      
+      radarChartInstance.data.datasets[0].data = Object.values(knowledgeStats);
+      radarChartInstance.update();
+
+      document.getElementById("questCount").value = "";
+      alert(`🎉 +${gainedXP} XP obtidos por resolver ${count} questões de ${subject}!`);
     }
 
-    // Assuntos e Simulados
-    function addSubject() {
-      const input = document.getElementById("subjectInput");
+    // Loja de 100 Conquistas (Exemplo Gerado)
+    function renderShop() {
+      const shopContainer = document.getElementById("shopContainer");
+      shopContainer.innerHTML = "";
+      
+      for (let i = 1; i <= 100; i++) {
+        const cost = i * 80;
+        const isUnlocked = unlockedAchievements.includes(i);
+        shopContainer.innerHTML += `<div class="shop-item">
+          <span>Conquista #${i} - Marca de Aprendiz ${i}</span>
+          <button class="buy-btn" ${isUnlocked || userXP < cost ? 'disabled' : ''} onclick="buyAchievement(${i}, ${cost})">
+            ${isUnlocked ? 'Comprado ✓' : `${cost} XP`}
+          </button>
+        </div>`;
+      }
+    }
+
+    function buyAchievement(id, cost) {
+      if (userXP >= cost) {
+        userXP -= cost;
+        unlockedAchievements.push(id);
+        localStorage.setItem("userXP", userXP);
+        localStorage.setItem("unlockedAchievements", JSON.stringify(unlockedAchievements));
+        updateUI();
+        renderShop();
+      }
+    }
+
+    // Sala Virtual
+    function renderClassroom() {
+      const grid = document.getElementById("classroomGrid");
+      const classmates = ["Isagi", "Bachira", "Chigiri", "Nagi", "Rin", "Barou"];
+      grid.innerHTML = "";
+      classmates.forEach(name => {
+        grid.innerHTML += `<div class="desk studying">
+          <span>👤 ${name}</span><br>
+          <small style="color:#2ed573;">Estudando...</small>
+        </div>`;
+      });
+    }
+
+    // Hábitos e Saúde
+    function addWater(amount) {
+      waterConsumed = Math.min(waterConsumed + amount, 3000);
+      localStorage.setItem("waterConsumed", waterConsumed);
+      document.getElementById("waterCount").textContent = waterConsumed;
+    }
+
+    function addWorkout() {
+      const input = document.getElementById("workoutInput");
       if (!input.value.trim()) return;
-      subjects.push({ id: Date.now(), title: input.value });
+      workouts.push(input.value);
       input.value = "";
-      saveSubjects();
+      localStorage.setItem("workouts", JSON.stringify(workouts));
+      renderWorkouts();
     }
 
-    function removeSubject(id) {
-      subjects = subjects.filter(s => s.id !== id);
-      saveSubjects();
-    }
-
-    function saveSubjects() {
-      localStorage.setItem("subjects", JSON.stringify(subjects));
-      renderSubjects();
-    }
-
-    function renderSubjects() {
-      const list = document.getElementById("subjectList");
+    function renderWorkouts() {
+      const list = document.getElementById("workoutList");
       list.innerHTML = "";
-      subjects.forEach(s => {
-        list.innerHTML += `<li>${s.title} <span class="remove-item" onclick="removeSubject(${s.id})">✕</span></li>`;
+      workouts.forEach((w, i) => {
+        list.innerHTML += `<li>${w} <span style="color:#e63946; cursor:pointer;" onclick="removeWorkout(${i})">✕</span></li>`;
       });
     }
 
-    function addSimulado() {
-      const title = document.getElementById("simTitle").value;
-      const date = document.getElementById("simDate").value;
-      if (!title || !date) return;
-      simulados.push({ id: Date.now(), title, date });
-      document.getElementById("simTitle").value = "";
-      document.getElementById("simDate").value = "";
-      saveSimulados();
+    function removeWorkout(i) {
+      workouts.splice(i, 1);
+      localStorage.setItem("workouts", JSON.stringify(workouts));
+      renderWorkouts();
     }
 
-    function removeSimulado(id) {
-      simulados = simulados.filter(s => s.id !== id);
-      saveSimulados();
-    }
-
-    function saveSimulados() {
-      localStorage.setItem("simulados", JSON.stringify(simulados));
-      renderSimulados();
-    }
-
-    function renderSimulados() {
-      const list = document.getElementById("simList");
-      list.innerHTML = "";
-      simulados.forEach(s => {
-        const diffDays = Math.ceil((new Date(s.date) - new Date()) / (1000 * 60 * 60 * 24));
-        const text = diffDays >= 0 ? `Faltam ${diffDays}d` : "Concluído";
-        list.innerHTML += `<li>${s.title} (${text}) <span class="remove-item" onclick="removeSimulado(${s.id})">✕</span></li>`;
-      });
-    }
-
-    function addStress(amount) {
-      stressLevel = Math.min(stressLevel + amount, 100);
-      updateGamificationUI();
-    }
-
-    function reduceStress(amount) {
-      stressLevel = Math.max(stressLevel - amount, 0);
-      updateGamificationUI();
-    }
-
-    function addXP(amount) {
-      userXP += amount;
+    // Gamificação e Auxiliares
+    function addXP(val) {
+      userXP += val;
       const xpNeeded = userLevel * 100;
       if (userXP >= xpNeeded) {
         userXP -= xpNeeded;
         userLevel++;
-        alert(`🎉 Subiu para o Nível ${userLevel}!`);
       }
-      updateGamificationUI();
+      updateUI();
     }
 
-    function updateGamificationUI() {
-      const xpNeeded = userLevel * 100;
+    function addStress(val) { stressLevel = Math.min(stressLevel + val, 100); updateUI(); }
+    function reduceStress(val) { stressLevel = Math.max(stressLevel - val, 0); updateUI(); }
+
+    function updateUI() {
       document.getElementById("levelDisplay").textContent = `Nível ${userLevel}`;
-      document.getElementById("xpBar").style.width = `${Math.min((userXP / xpNeeded) * 100, 100)}%`;
+      document.getElementById("xpDisplay").textContent = userXP;
+      document.getElementById("xpBar").style.width = `${Math.min((userXP / (userLevel * 100)) * 100, 100)}%`;
       document.getElementById("stressDisplay").textContent = `${stressLevel}%`;
       document.getElementById("stressBar").style.width = `${stressLevel}%`;
-
-      updateTimeStats();
+      document.getElementById("waterCount").textContent = waterConsumed;
 
       localStorage.setItem("userLevel", userLevel);
       localStorage.setItem("userXP", userXP);
       localStorage.setItem("stressLevel", stressLevel);
     }
 
-    function changeTheme(themeClass) { document.body.className = themeClass; }
-
-    function resetButtons() {
-      btnStart.style.display = "block";
-      btnPause.style.display = "none";
-      btnPause.textContent = "Pausar";
-      btnFinish.style.display = "none";
-      btnCancel.style.display = "none";
-      timeLeft = selectedMinutes * 60;
-      updateDisplay();
-    }
-
-    // Registro do ServiceWorker
+    // Register Service Worker for PWA
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("sw.js");
-    }
-
-    // Lógica do Botão de Instalar PWA
-    let deferredPrompt;
-    const btnInstall = document.getElementById('btnInstall');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      if (btnInstall) {
-        btnInstall.style.display = 'block';
-      }
-    });
-
-    if (btnInstall) {
-      btnInstall.addEventListener('click', () => {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-              btnInstall.style.display = 'none';
-            }
-            deferredPrompt = null;
-          });
-        }
-      });
     }
   </script>
 </body>
