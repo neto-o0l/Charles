@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Professor de Estudos - RPG Supremo</title>
+  <title>Student Maker</title>
 
   <!-- PWA & Mobile Icons -->
   <link rel="manifest" href="./manifest.json">
@@ -11,7 +11,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Professor">
+  <meta name="apple-mobile-web-app-title" content="Student Maker">
   <link rel="apple-touch-icon" href="Professor_neutro.png">
 
   <!-- Chart.js para o Gráfico de Teia -->
@@ -31,6 +31,38 @@
       padding: 15px;
       text-align: center;
       transition: background-color 0.4s ease;
+    }
+
+    /* Tela de Abertura / Splash Screen */
+    #splashScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #000000;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      transition: opacity 1s ease, visibility 1s ease;
+    }
+
+    .splash-text {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #00adb5;
+      text-shadow: 0 0 15px rgba(0, 173, 181, 0.6);
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+      text-align: center;
+      max-width: 80%;
+    }
+
+    .splash-text.active {
+      opacity: 1;
     }
 
     /* Cores de Fundo Personalizadas */
@@ -219,6 +251,11 @@
   </style>
 </head>
 <body id="bgBody" class="theme-dark">
+
+  <!-- Tela de Abertura / Splash Screen -->
+  <div id="splashScreen">
+    <div id="splashText" class="splash-text"></div>
+  </div>
 
   <div class="card">
     <!-- Topo Gamificado -->
@@ -426,7 +463,47 @@
   </div>
 
   <script>
-    // Audios
+    // Configuração do Splash Screen (Frases & Áudios Opcionais)
+    const splashQuotes = [
+      { text: "Olá diamantes brutos com talento", audio: "frase1.mp3" },
+      { text: "A ciência é realmente muito elegante", audio: "frase2.mp3" },
+      { text: "Isso é tão empolgante", audio: "frase3.mp3" },
+      { text: "A ciência é poder", audio: "frase4.mp3" }
+    ];
+
+    function runSplashScreen() {
+      const splashScreen = document.getElementById("splashScreen");
+      const splashText = document.getElementById("splashText");
+      let index = 0;
+
+      function showNextQuote() {
+        if (index < splashQuotes.length) {
+          splashText.textContent = `"${splashQuotes[index].text}"`;
+          splashText.classList.add("active");
+
+          // Toca o áudio da frase correspondente, caso o arquivo exista na pasta
+          try {
+            const voiceAudio = new Audio(splashQuotes[index].audio);
+            voiceAudio.play().catch(() => {});
+          } catch(e) {}
+
+          setTimeout(() => {
+            splashText.classList.remove("active");
+            index++;
+            setTimeout(showNextQuote, 500);
+          }, 2000);
+        } else {
+          splashScreen.style.opacity = "0";
+          splashScreen.style.visibility = "hidden";
+        }
+      }
+
+      showNextQuote();
+    }
+
+    window.addEventListener("DOMContentLoaded", runSplashScreen);
+
+    // Audios do Sistema
     const AUDIO_BRONCA = new Audio("https://assets.mixkit.co/active_storage/sfx/2874/2874-preview.mp3");
     const AUDIO_SUCESSO = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
 
