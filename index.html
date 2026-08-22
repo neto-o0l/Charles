@@ -281,6 +281,17 @@
       margin-bottom: 8px;
       display: none;
     }
+
+    /* Estilos Adicionais para o Seletor de Sons Lofi/Ruídos */
+    .audio-panel {
+      background: #222226;
+      border-radius: 10px;
+      padding: 8px;
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
   </style>
 </head>
 <body id="bgBody" class="theme-dark">
@@ -340,6 +351,26 @@
       <div style="display: flex; gap: 4px;">
         <button id="btnLofi" class="main-btn lofi-btn" style="flex:1; font-size:0.75rem;" onclick="toggleLofi()">🎵 Lofi/Ruído</button>
         <button id="btnHardcore" class="main-btn hardcore-btn" style="flex:1; font-size:0.75rem;" onclick="toggleHardcore()">🔒 Modo Foco</button>
+      </div>
+
+      <!-- PAINEL EXPANDIDO DE RUÍDOS E LOFI -->
+      <div class="audio-panel">
+        <div class="custom-row">
+          <label>🎧 Tipo de Som:</label>
+          <select id="selectAudioMode" onchange="changeAudioSource(this.value)">
+            <option value="lofi1">🎵 Lofi Chill Hop 1</option>
+            <option value="lofi2">🎧 Lofi Beats Relax 2</option>
+            <option value="lofi3">🎹 Lofi Piano Chill 3</option>
+            <option value="rain">🌧️ Ruído: Chuva Suave</option>
+            <option value="white">📻 Ruído: Branco (Foco)</option>
+            <option value="pink">🌊 Ruído: Rosa (Ondas)</option>
+            <option value="cafe">☕ Ruído: Cafeteria / Ambiência</option>
+          </select>
+        </div>
+        <div class="custom-row">
+          <label>🔊 Volume Som:</label>
+          <input type="range" id="audioVolume" min="0" max="1" step="0.05" value="0.5" oninput="setAudioVolume(this.value)" style="width: 50%;">
+        </div>
       </div>
     </div>
 
@@ -623,21 +654,123 @@
     const AUDIO_BRONCA = new Audio("https://assets.mixkit.co/active_storage/sfx/2874/2874-preview.mp3");
     const AUDIO_SUCESSO = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
 
-    // Lofi / Áudio de Foco Integrado
-    const lofiAudio = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+    // Lofi e Gerador de Ruídos Ambientes Ampliado
+    const audioSources = {
+      lofi1: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+      lofi2: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+      lofi3: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+      rain: "https://assets.mixkit.co/active_storage/sfx/1250/1250-preview.mp3",
+      white: "https://assets.mixkit.co/active_storage/sfx/2432/2432-preview.mp3",
+      pink: "https://assets.mixkit.co/active_storage/sfx/1247/1247-preview.mp3",
+      cafe: "https://assets.mixkit.co/active_storage/sfx/388/388-preview.mp3"
+    };
+
+    let currentAudioKey = "lofi1";
+    const lofiAudio = new Audio(audioSources[currentAudioKey]);
     lofiAudio.loop = true;
     let isLofiPlaying = false;
+
+    // Gerador Sintético WebAudio API de Suporte (Sintetizador de Ruído Branco/Rosa Puro)
+    let audioCtx = null;
+    let noiseNode = null;
+    let isSyntheticNoise = false;
+
+    function changeAudioSource(key) {
+      currentAudioKey = key;
+      if (isSyntheticNoise) {
+        stopSyntheticNoise();
+      }
+      
+      if (key === "white" || key === "pink") {
+        if (isLofiPlaying) {
+          lofiAudio.pause();
+          playSyntheticNoise(key);
+        }
+      } else {
+        lofiAudio.src = audioSources[key];
+        if (isLofiPlaying) {
+          lofiAudio.play().catch(() => {});
+        }
+      }
+    }
+
+    function setAudioVolume(val) {
+      lofiAudio.volume = parseFloat(val);
+      if (noiseNode && noiseNode.gainNode) {
+        noiseNode.gainNode.gain.value = parseFloat(val) * 0.1;
+      }
+    }
 
     function toggleLofi() {
       if (isLofiPlaying) {
         lofiAudio.pause();
+        stopSyntheticNoise();
         isLofiPlaying = false;
         document.getElementById("btnLofi").style.background = "#a55eea";
       } else {
-        lofiAudio.play().catch(() => {});
+        if (currentAudioKey === "white" || currentAudioKey === "pink") {
+          playSyntheticNoise(currentAudioKey);
+        } else {
+          lofiAudio.play().catch(() => {});
+        }
         isLofiPlaying = true;
         document.getElementById("btnLofi").style.background = "#2ed573";
       }
+    }
+
+    function playSyntheticNoise(type) {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        stopSyntheticNoise();
+        
+        const bufferSize = audioCtx.sampleRate * 2;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          if (type === "pink") {
+            b0 = 0.99886 * b0 + white * 0.0555179;
+            b1 = 0.99332 * b1 + white * 0.0750759;
+            b2 = 0.96900 * b2 + white * 0.1538520;
+            b3 = 0.86650 * b3 + white * 0.3104856;
+            b4 = 0.55000 * b4 + white * 0.5329522;
+            b5 = -0.7616 * b5 - white * 0.0168980;
+            data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+            data[i] *= 0.11;
+            b6 = white * 0.115926;
+          } else {
+            data[i] = white;
+          }
+        }
+
+        const noiseSrc = audioCtx.createBufferSource();
+        noiseSrc.buffer = buffer;
+        noiseSrc.loop = true;
+
+        const gainNode = audioCtx.createGain();
+        const currentVol = parseFloat(document.getElementById("audioVolume").value) || 0.5;
+        gainNode.gain.value = currentVol * 0.1;
+
+        noiseSrc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        noiseSrc.start();
+
+        noiseNode = { source: noiseSrc, gainNode: gainNode };
+        isSyntheticNoise = true;
+      } catch(e) {}
+    }
+
+    function stopSyntheticNoise() {
+      if (noiseNode && noiseNode.source) {
+        try { noiseNode.source.stop(); } catch(e){}
+        noiseNode = null;
+      }
+      isSyntheticNoise = false;
     }
 
     // Estados Globais
