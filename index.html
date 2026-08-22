@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>"Student Maker"</title>
+  <title>Student Maker</title>
 
   <!-- PWA & Mobile Icons -->
   <link rel="manifest" href="./manifest.json">
@@ -60,7 +60,6 @@
       max-width: 80%;
     }
 
-    /* Animação para piscar a frase */
     @keyframes blinkEffect {
       0% { opacity: 0; }
       25% { opacity: 1; }
@@ -119,6 +118,7 @@
     .progress-bar-fill { background: #00adb5; height: 100%; width: 0%; transition: width 0.3s; }
     .chapters-fill { background: #2ed573 !important; }
     .stress-fill { background: #e63946 !important; }
+    .boss-fill { background: #ff4757 !important; }
 
     .mascot-container {
       height: 140px;
@@ -205,8 +205,9 @@
     button.pause { background: #f39c12; }
     button.cancel { background: #e63946; }
     button.install { background: #2ed573; }
+    button.lofi-btn { background: #a55eea; }
+    button.hardcore-btn { background: #ff5252; }
 
-    /* Ranking & Avatares */
     .avatar-img {
       width: 32px;
       height: 32px;
@@ -217,7 +218,6 @@
     }
     .rank-user-row { background: #00adb5 !important; color: #fff; font-weight: bold; }
 
-    /* Sala de Aula Virtual */
     .classroom-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -236,7 +236,6 @@
     .desk.studying { border: 2px solid #2ed573; }
     .desk .avatar-img { margin-right: 0; margin-bottom: 4px; }
 
-    /* Loja */
     .shop-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -256,6 +255,20 @@
     .buy-btn:disabled { background: #555; cursor: not-allowed; }
 
     .custom-row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.75rem; }
+
+    /* Flashcards */
+    .flashcard {
+      background: #3e3e4a;
+      padding: 20px;
+      border-radius: 12px;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
   </style>
 </head>
 <body id="bgBody" class="theme-dark">
@@ -280,7 +293,7 @@
     </div>
     <div class="progress-bar-bg"><div id="stressBar" class="progress-bar-fill stress-fill"></div></div>
 
-    <!-- Mascote & Falas -->
+    <!-- Mascote Dinâmico & Falas -->
     <div class="mascot-container">
       <img id="mascot" class="mascot" src="Professor_neutro.png" alt="Mascote">
     </div>
@@ -302,13 +315,17 @@
     <div id="activeSubjectLabel" style="font-size:0.8rem; color:#00adb5; font-weight:bold; height:16px;"></div>
     <div id="timer" class="timer">50:00</div>
 
-    <!-- Controles -->
+    <!-- Controles & Áudio/Hardcore -->
     <div class="buttons" style="margin-bottom: 10px;">
       <button id="btnInstall" class="main-btn install" style="display: none;">📲 Instalar Aplicativo</button>
       <button id="btnStart" class="main-btn" onclick="startTimer()">Iniciar Bloco</button>
       <button id="btnPause" class="main-btn pause" onclick="pauseTimer()" style="display: none;">Pausar</button>
       <button id="btnFinish" class="main-btn" onclick="finishTimer()" style="display: none;">Concluir Bloco</button>
       <button id="btnCancel" class="main-btn cancel" onclick="cancelTimer()" style="display: none;">Desistir</button>
+      <div style="display: flex; gap: 4px;">
+        <button id="btnLofi" class="main-btn lofi-btn" style="flex:1; font-size:0.75rem;" onclick="toggleLofi()">🎵 Lofi/Ruído</button>
+        <button id="btnHardcore" class="main-btn hardcore-btn" style="flex:1; font-size:0.75rem;" onclick="toggleHardcore()">🔒 Modo Foco</button>
+      </div>
     </div>
 
     <!-- Opções de Personalização de Fundo -->
@@ -326,22 +343,26 @@
     </div>
   </div>
 
-  <!-- Abas de Navegação -->
+  <!-- Abas de Navegação (Com Novas Abas Adicionadas) -->
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('cronograma')">📅 Cronograma</button>
     <button class="tab-btn" onclick="switchTab('ranking')">👑 Ranking</button>
+    <button class="tab-btn" onclick="switchTab('boss')">🐉 Chefe Semanal</button>
+    <button class="tab-btn" onclick="switchTab('skills')">🌳 Habilidades</button>
+    <button class="tab-btn" onclick="switchTab('flashcards')">🎴 Flashcards</button>
     <button class="tab-btn" onclick="switchTab('livros')">📖 Livros & Capítulos</button>
     <button class="tab-btn" onclick="switchTab('radar')">🕸️ Radar</button>
     <button class="tab-btn" onclick="switchTab('questoes')">📝 Questões</button>
     <button class="tab-btn" onclick="switchTab('loja')">🏆 Loja (100)</button>
     <button class="tab-btn" onclick="switchTab('sala')">🏫 Sala Virtual</button>
     <button class="tab-btn" onclick="switchTab('saude')">💧 Treino & Água</button>
+    <button class="tab-btn" onclick="switchTab('metas')">🎯 Meta/Corte</button>
   </div>
 
-  <!-- Card Principal com os Conteúdos das Abas -->
+  <!-- Card Principal com Conteúdos -->
   <div class="card">
     
-    <!-- ABA 1: CRONOGRAMA ADAPTATIVO (+XP AO CONCLUIR) -->
+    <!-- ABA 1: CRONOGRAMA -->
     <div id="tab-cronograma" class="tab-content active">
       <div class="box-section">
         <div class="box-title">📅 Blocos de Hoje (<span id="currentDayName"></span>):</div>
@@ -353,8 +374,13 @@
       </div>
     </div>
 
-    <!-- ABA 2: RANKING DINÂMICO & FOTOS -->
+    <!-- ABA 2: RANKING DINÂMICO & MENSAGENS DOS RIVAIS -->
     <div id="tab-ranking" class="tab-content">
+      <div class="box-section">
+        <div class="box-title">💬 Provocação do Líder:</div>
+        <p id="rivalTaunt" style="font-style: italic; color: #ff9f43; margin-bottom: 4px;"></p>
+      </div>
+
       <div class="box-section">
         <div class="box-title">🏆 Tabela de Classificação RPG:</div>
         <ul id="rankingList" class="item-list"></ul>
@@ -379,7 +405,46 @@
       </div>
     </div>
 
-    <!-- ABA 3: LIVROS & CAPÍTULOS POR MATÉRIA -->
+    <!-- ABA 3: BATALHA DE CHEFE SEMANAL (NOVA) -->
+    <div id="tab-boss" class="tab-content">
+      <div class="box-section">
+        <div class="box-title">👾 Simulado Final da Semana:</div>
+        <h4 id="bossName" style="color: #ff4757; margin-bottom: 6px;">O Monstro do Enem</h4>
+        <p style="font-size:0.75rem;">Vida do Boss: <strong id="bossHpDisplay">1000/1000</strong></p>
+        <div class="progress-bar-bg"><div id="bossHpBar" class="progress-bar-fill boss-fill"></div></div>
+        <p style="font-size: 0.7rem; color: #aaa; margin-top: 6px;">* Complete blocos de estudo e responda questões para causar dano ao Chefe!</p>
+      </div>
+    </div>
+
+    <!-- ABA 4: ÁRVORE DE HABILIDADES / SKILL TREE (NOVA) -->
+    <div id="tab-skills" class="tab-content">
+      <div class="box-section">
+        <div class="box-title">🌳 Passivas e Atributos:</div>
+        <div class="shop-grid" id="skillsContainer"></div>
+      </div>
+    </div>
+
+    <!-- ABA 5: FLASHCARDS COM REPETIÇÃO ESPAÇADA (NOVA) -->
+    <div id="tab-flashcards" class="tab-content">
+      <div class="box-section">
+        <div class="box-title">🎴 Revisão Ativa:</div>
+        <div class="flashcard" id="flashcardBox" onclick="flipCard()">
+          <span id="flashcardText">Clique para ver uma pergunta/resposta!</span>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="add-btn" style="background:#2ed573; flex:1;" onclick="nextCard(true)">Fácil (+XP)</button>
+          <button class="add-btn" style="background:#e63946; flex:1;" onclick="nextCard(false)">Errei</button>
+        </div>
+      </div>
+      <div class="box-section">
+        <div class="box-title">➕ Criar Flashcard:</div>
+        <input type="text" id="fcFront" placeholder="Pergunta" style="margin-bottom:4px;">
+        <input type="text" id="fcBack" placeholder="Resposta" style="margin-bottom:4px;">
+        <button class="add-btn" style="width:100%;" onclick="addFlashcard()">Salvar Cartão</button>
+      </div>
+    </div>
+
+    <!-- ABA 6: LIVROS & CAPÍTULOS POR MATÉRIA -->
     <div id="tab-livros" class="tab-content">
       <div class="box-section">
         <div class="box-title">📊 Progresso Geral dos Capítulos:</div>
@@ -401,15 +466,19 @@
       </div>
     </div>
 
-    <!-- ABA 4: RADAR DE CONHECIMENTO (GRÁFICO DE TEIA) -->
+    <!-- ABA 7: RADAR DE CONHECIMENTO -->
     <div id="tab-radar" class="tab-content">
       <div class="box-section">
         <div class="box-title">🕸️ Teia de Conhecimento:</div>
         <canvas id="radarChart" width="300" height="300"></canvas>
       </div>
+      <div class="box-section">
+        <div class="box-title">📈 Desempenho Relatório:</div>
+        <p style="font-size: 0.75rem;" id="reportStats">Mais Estudado: - | Precisando de Foco: -</p>
+      </div>
     </div>
 
-    <!-- ABA 5: CONVERSOR DE QUESTÕES EM XP -->
+    <!-- ABA 8: CONVERSOR DE QUESTÕES EN XP -->
     <div id="tab-questoes" class="tab-content">
       <div class="box-section">
         <div class="box-title">📝 Registrar Questões Resolvidas:</div>
@@ -435,7 +504,7 @@
       </div>
     </div>
 
-    <!-- ABA 6: LOJA DE 100 CONQUISTAS (TROCA XP) -->
+    <!-- ABA 9: LOJA DE 100 CONQUISTAS -->
     <div id="tab-loja" class="tab-content">
       <div class="box-section">
         <div class="box-title">🏆 Loja de Conquistas (Gaste XP):</div>
@@ -443,7 +512,7 @@
       </div>
     </div>
 
-    <!-- ABA 7: SALA DE AULA VIRTUAL -->
+    <!-- ABA 10: SALA DE AULA VIRTUAL -->
     <div id="tab-sala" class="tab-content">
       <div class="box-section">
         <div class="box-title">🏫 Colegas Estudando Agora:</div>
@@ -451,7 +520,7 @@
       </div>
     </div>
 
-    <!-- ABA 8: SAÚDE E HÁBITOS -->
+    <!-- ABA 11: SAÚDE E HÁBITOS -->
     <div id="tab-saude" class="tab-content">
       <div class="box-section">
         <div class="box-title">💧 Hidratação Diária:</div>
@@ -468,10 +537,20 @@
       </div>
     </div>
 
+    <!-- ABA 12: CALCULADORA DE CORTE (NOVA) -->
+    <div id="tab-metas" class="tab-content">
+      <div class="box-section">
+        <div class="box-title">🎯 Nota de Corte / Objetivo:</div>
+        <input type="number" id="targetScore" placeholder="Ex: 750 (Nota de Corte)" style="margin-bottom:6px;">
+        <button class="add-btn" style="width:100%;" onclick="saveTargetScore()">Salvar Meta</button>
+        <p style="margin-top:8px; font-size:0.75rem;" id="targetScoreStatus">Sua Pontuação RPG Estimada: 0</p>
+      </div>
+    </div>
+
   </div>
 
   <script>
-    // Configuração do Splash Screen (Escolha Aleatória de 1 Frase com Piscar)
+    // Configuração do Splash Screen
     const splashQuotes = [
       { text: "Olá diamantes brutos com talento", audio: "frase1.mp3" },
       { text: "A ciência é realmente muito elegante", audio: "frase2.mp3" },
@@ -483,20 +562,17 @@
       const splashScreen = document.getElementById("splashScreen");
       const splashText = document.getElementById("splashText");
 
-      // Seleção Aleatória (25% de chance para cada uma das 4 frases)
       const randomIndex = Math.floor(Math.random() * splashQuotes.length);
       const chosenQuote = splashQuotes[randomIndex];
 
       splashText.textContent = `"${chosenQuote.text}"`;
       splashText.classList.add("blink");
 
-      // Toca o áudio da frase sorteada (se disponível)
       try {
         const voiceAudio = new Audio(chosenQuote.audio);
         voiceAudio.play().catch(() => {});
       } catch(e) {}
 
-      // Esconde a tela de abertura após a animação de piscar (2.5 segundos)
       setTimeout(() => {
         splashScreen.style.opacity = "0";
         splashScreen.style.visibility = "hidden";
@@ -505,11 +581,30 @@
 
     window.addEventListener("DOMContentLoaded", runSplashScreen);
 
-    // Audios do Sistema
+    // Efeitos Sonoros / Áudios
+    const AUDIO_CLICK = new Audio("https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3");
+    const AUDIO_LEVELUP = new Audio("https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3");
     const AUDIO_BRONCA = new Audio("https://assets.mixkit.co/active_storage/sfx/2874/2874-preview.mp3");
     const AUDIO_SUCESSO = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
 
-    // Estados
+    // Lofi / Áudio de Foco Integrado
+    const lofiAudio = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+    lofiAudio.loop = true;
+    let isLofiPlaying = false;
+
+    function toggleLofi() {
+      if (isLofiPlaying) {
+        lofiAudio.pause();
+        isLofiPlaying = false;
+        document.getElementById("btnLofi").style.background = "#a55eea";
+      } else {
+        lofiAudio.play().catch(() => {});
+        isLofiPlaying = true;
+        document.getElementById("btnLofi").style.background = "#2ed573";
+      }
+    }
+
+    // Estados Globais
     let selectedMinutes = parseInt(localStorage.getItem("selectedMinutes")) || 50;
     let timeLeft = selectedMinutes * 60;
     let timerInterval = null;
@@ -523,7 +618,22 @@
     let waterConsumed = parseInt(localStorage.getItem("waterConsumed")) || 0;
     let currentTheme = localStorage.getItem("currentTheme") || "theme-dark";
 
-    // Dados do Ranking e Rivais
+    let bossHp = parseInt(localStorage.getItem("bossHp")) || 1000;
+    let hardcoreMode = false;
+
+    // Mascote: Estados/Imagens
+    function setMascotState(state) {
+      const mascotImg = document.getElementById("mascot");
+      if (state === "bravo") {
+        mascotImg.src = "Professor_bravo.png";
+      } else if (state === "estudando") {
+        mascotImg.src = "Professor_estudando.png";
+      } else {
+        mascotImg.src = "Professor_neutro.png";
+      }
+    }
+
+    // Rivais & Ranking
     let competitors = JSON.parse(localStorage.getItem("competitors")) || [
       { id: 0, name: "Você (Jogador)", level: 1, xp: 0, isUser: true, avatar: "https://via.placeholder.com/150/00adb5/ffffff?text=Você" },
       { id: 1, name: "Isagi", level: 2, xp: 180, isUser: false, avatar: "https://via.placeholder.com/150/3e3e4a/ffffff?text=Isagi" },
@@ -533,7 +643,15 @@
       { id: 5, name: "Barou", level: 2, xp: 210, isUser: false, avatar: "https://via.placeholder.com/150/3e3e4a/ffffff?text=Barou" }
     ];
 
-    // Capítulos das Matérias
+    // Provocações dos Rivais
+    const taunts = [
+      "Nagi: 'Você está realmente tentando me acompanhar? Que preguiça...'",
+      "Barou: 'Cai fora do meu caminho, você é só mais um coadjuvante!'",
+      "Isagi: 'Estou devorando cada matéria. É melhor você se mexer!'",
+      "Bachira: 'O meu monstro interno quer ver você estudar mais rápido!'"
+    ];
+
+    // Capítulos
     let subjectChapters = JSON.parse(localStorage.getItem("subjectChapters")) || {
       "TQM (Matemática Fund.)": { done: 0, total: 46 },
       "TQM (Matemática Médio)": { done: 0, total: 20 },
@@ -568,10 +686,19 @@
     let pendingTasks = JSON.parse(localStorage.getItem("pendingTasks")) || [];
     let workouts = JSON.parse(localStorage.getItem("workouts")) || [];
     let unlockedAchievements = JSON.parse(localStorage.getItem("unlockedAchievements")) || [];
+    let unlockedSkills = JSON.parse(localStorage.getItem("unlockedSkills")) || [];
+
+    // Flashcards Data
+    let flashcards = JSON.parse(localStorage.getItem("flashcards")) || [
+      { front: "Qual a fórmula da velocidade média?", back: "V = Δs / Δt" },
+      { front: "Quem escreveu Dom Casmurro?", back: "Machado de Assis" }
+    ];
+    let currentCardIndex = 0;
+    let showingBack = false;
 
     const timerEl = document.getElementById("timer");
 
-    // Inicialização
+    // Inicializações
     changeTheme(currentTheme);
     document.getElementById("selectTheme").value = currentTheme;
     document.getElementById("selectTimerDuration").value = selectedMinutes;
@@ -583,6 +710,9 @@
     renderShop();
     renderWorkouts();
     renderChaptersTab();
+    renderSkills();
+    renderBoss();
+    renderFlashcard();
 
     let radarChartInstance = null;
     initRadarChart();
@@ -601,6 +731,7 @@
     }
 
     function switchTab(tabId) {
+      AUDIO_CLICK.play();
       document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
       document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
       
@@ -643,6 +774,7 @@
     function completeScheduleTask(dayIdx, taskIdx) {
       addXP(50);
       reduceStress(10);
+      damageBoss(50);
       AUDIO_SUCESSO.play();
       weeklySchedule[dayIdx].splice(taskIdx, 1);
       localStorage.setItem("weeklySchedule", JSON.stringify(weeklySchedule));
@@ -672,7 +804,7 @@
       renderPending();
     }
 
-    // Ranking Dinâmico e Boost dos Rivais
+    // Ranking Dinâmico e Provocações
     function renderRanking() {
       const userObj = competitors.find(c => c.isUser);
       userObj.level = userLevel;
@@ -708,6 +840,7 @@
         </li>`;
       });
 
+      document.getElementById("rivalTaunt").textContent = taunts[Math.floor(Math.random() * taunts.length)];
       renderClassroom();
     }
 
@@ -782,9 +915,13 @@
       renderChaptersTab();
     }
 
-    // Cronômetro
+    // Cronômetro & Mudanças do Mascote
     function startTimer() {
       if (timerInterval) return;
+      
+      setMascotState("estudando");
+      document.getElementById("speech").textContent = "Foco total agora! O seu futuro está sendo construído!";
+
       document.getElementById("selectTimerDuration").disabled = true;
       document.getElementById("btnStart").style.display = "none";
       document.getElementById("btnPause").style.display = "block";
@@ -818,10 +955,16 @@
       clearInterval(timerInterval);
       AUDIO_SUCESSO.play();
       
-      const gainedXP = Math.floor(selectedMinutes * 2); 
+      let gainedXP = Math.floor(selectedMinutes * 2);
+      if (unlockedSkills.includes("boostXp")) gainedXP = Math.floor(gainedXP * 1.2);
+
       addXP(gainedXP);
       reduceStress(20);
-      
+      damageBoss(100);
+
+      setMascotState("neutro");
+      document.getElementById("speech").textContent = "Excelente trabalho! Bloco concluído com sucesso!";
+
       alert(`✨ Bloco de ${selectedMinutes} min concluído com sucesso! +${gainedXP} XP!`);
       resetTimer();
     }
@@ -830,7 +973,12 @@
       clearInterval(timerInterval);
       AUDIO_BRONCA.play();
       
-      const addedStress = Math.floor(selectedMinutes * 0.5);
+      setMascotState("bravo");
+      document.getElementById("speech").textContent = "Você desistiu do bloco! Mais foco da próxima vez!";
+
+      let addedStress = Math.floor(selectedMinutes * 0.5);
+      if (unlockedSkills.includes("shieldStress")) addedStress = Math.floor(addedStress * 0.5);
+      
       addStress(addedStress);
       
       const dayIdx = new Date().getDay();
@@ -857,7 +1005,31 @@
       updateDisplay();
     }
 
-    // Radar Chart
+    // Modo Hardcore / Perda de Foco por Mudar de Aba
+    function toggleHardcore() {
+      hardcoreMode = !hardcoreMode;
+      const btn = document.getElementById("btnHardcore");
+      if (hardcoreMode) {
+        btn.style.background = "#2ed573";
+        btn.textContent = "🔒 Foco Ativo";
+        alert("Modo Foco Total ativado! Se trocar de aba enquanto o temporizador roda, perderá XP!");
+      } else {
+        btn.style.background = "#ff5252";
+        btn.textContent = "🔒 Modo Foco";
+      }
+    }
+
+    window.addEventListener("visibilitychange", () => {
+      if (document.hidden && timerInterval && hardcoreMode) {
+        addStress(15);
+        userXP = Math.max(0, userXP - 20);
+        updateUI();
+        setMascotState("bravo");
+        document.getElementById("speech").textContent = "Ei! Você saiu da aba enquanto estudava! Penalidade aplicada!";
+      }
+    });
+
+    // Radar Chart & Relatórios
     function initRadarChart() {
       const ctx = document.getElementById('radarChart').getContext('2d');
       radarChartInstance = new Chart(ctx, {
@@ -876,6 +1048,17 @@
           scales: { r: { min: 0, max: 100, ticks: { display: false } } }
         }
       });
+      updateReportStats();
+    }
+
+    function updateReportStats() {
+      let maxSub = "-", minSub = "-";
+      let maxVal = -1, minVal = 999;
+      for (let s in knowledgeStats) {
+        if (knowledgeStats[s] > maxVal) { maxVal = knowledgeStats[s]; maxSub = s; }
+        if (knowledgeStats[s] < minVal) { minVal = knowledgeStats[s]; minSub = s; }
+      }
+      document.getElementById("reportStats").textContent = `Mais Estudado: ${maxSub} (${maxVal}%) | Precisando de Foco: ${minSub} (${minVal}%)`;
     }
 
     function submitQuestions() {
@@ -885,15 +1068,119 @@
 
       const gainedXP = count * 5;
       addXP(gainedXP);
+      damageBoss(count * 10);
 
       knowledgeStats[subject] = Math.min(knowledgeStats[subject] + Math.ceil(count / 2), 100);
       localStorage.setItem("knowledgeStats", JSON.stringify(knowledgeStats));
       
       radarChartInstance.data.datasets[0].data = Object.values(knowledgeStats);
       radarChartInstance.update();
+      updateReportStats();
 
       document.getElementById("questCount").value = "";
       alert(`🎉 +${gainedXP} XP obtidos por resolver ${count} questões de ${subject}!`);
+    }
+
+    // Batalha de Chefe (Boss Fight)
+    function renderBoss() {
+      document.getElementById("bossHpDisplay").textContent = `${bossHp}/1000`;
+      document.getElementById("bossHpBar").style.width = `${Math.max(0, (bossHp / 1000) * 100)}%`;
+    }
+
+    function damageBoss(amount) {
+      bossHp = Math.max(0, bossHp - amount);
+      localStorage.setItem("bossHp", bossHp);
+      renderBoss();
+      if (bossHp === 0) {
+        AUDIO_LEVELUP.play();
+        alert("🐉 PARABÉNS! Você derrotou o Chefe Semanal! Ganhou +300 XP!");
+        addXP(300);
+        bossHp = 1000;
+        localStorage.setItem("bossHp", bossHp);
+        renderBoss();
+      }
+    }
+
+    // Árvore de Habilidades (Skills Passivas)
+    const availableSkills = [
+      { id: "boostXp", name: "Mente Brilhante", desc: "+20% de XP ao concluir blocos", cost: 200 },
+      { id: "shieldStress", name: "Escudo Zen", desc: "Reduz 50% do estresse ao desistir", cost: 150 }
+    ];
+
+    function renderSkills() {
+      const container = document.getElementById("skillsContainer");
+      container.innerHTML = "";
+      availableSkills.forEach(s => {
+        const isUnlocked = unlockedSkills.includes(s.id);
+        container.innerHTML += `<div class="shop-item">
+          <div>
+            <strong>${s.name}</strong><br>
+            <small>${s.desc}</small>
+          </div>
+          <button class="buy-btn" ${isUnlocked || userXP < s.cost ? 'disabled' : ''} onclick="buySkill('${s.id}', ${s.cost})">
+            ${isUnlocked ? 'Ativo ✓' : `${s.cost} XP`}
+          </button>
+        </div>`;
+      });
+    }
+
+    function buySkill(id, cost) {
+      if (userXP >= cost) {
+        userXP -= cost;
+        unlockedSkills.push(id);
+        localStorage.setItem("userXP", userXP);
+        localStorage.setItem("unlockedSkills", JSON.stringify(unlockedSkills));
+        updateUI();
+        renderSkills();
+      }
+    }
+
+    // Flashcards
+    function renderFlashcard() {
+      if (flashcards.length === 0) {
+        document.getElementById("flashcardText").textContent = "Nenhum flashcard cadastrado!";
+        return;
+      }
+      const card = flashcards[currentCardIndex];
+      document.getElementById("flashcardText").textContent = showingBack ? card.back : card.front;
+    }
+
+    function flipCard() {
+      showingBack = !showingBack;
+      renderFlashcard();
+    }
+
+    function nextCard(success) {
+      if (success) addXP(10);
+      showingBack = false;
+      currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+      renderFlashcard();
+    }
+
+    function addFlashcard() {
+      const front = document.getElementById("fcFront").value.trim();
+      const back = document.getElementById("fcBack").value.trim();
+      if (!front || !back) return;
+      flashcards.push({ front, back });
+      localStorage.setItem("flashcards", JSON.stringify(flashcards));
+      document.getElementById("fcFront").value = "";
+      document.getElementById("fcBack").value = "";
+      alert("Flashcard adicionado!");
+      renderFlashcard();
+    }
+
+    // Meta / Calculadora
+    function saveTargetScore() {
+      const score = document.getElementById("targetScore").value;
+      if (!score) return;
+      localStorage.setItem("targetScore", score);
+      updateTargetScoreStatus();
+    }
+
+    function updateTargetScoreStatus() {
+      const target = localStorage.getItem("targetScore") || 0;
+      const currentScoreEst = (userLevel * 50) + Math.floor(userXP / 2);
+      document.getElementById("targetScoreStatus").textContent = `Sua Pontuação RPG Estimada: ${currentScoreEst} / Meta: ${target}`;
     }
 
     // Loja de 100 Conquistas
@@ -961,9 +1248,12 @@
       if (userXP >= xpNeeded) {
         userXP -= xpNeeded;
         userLevel++;
+        AUDIO_LEVELUP.play();
+        alert(`🎉 LEVEL UP! Você alcançou o Nível ${userLevel}!`);
       }
       updateUI();
       renderRanking();
+      updateTargetScoreStatus();
     }
 
     function addStress(val) { stressLevel = Math.min(stressLevel + val, 100); updateUI(); }
