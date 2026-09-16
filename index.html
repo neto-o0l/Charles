@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Maker</title>
+  <title>Student Maker - ITA/IME Edition</title>
 
   <!-- PWA & Mobile Icons -->
   <link rel="manifest" href="./manifest.json">
@@ -87,7 +87,7 @@
       border-radius: 20px;
       padding: 18px;
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
       margin-bottom: 15px;
     }
@@ -159,7 +159,7 @@
       overflow-x: auto;
       margin-bottom: 12px;
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
     }
     .tab-btn {
       background: #222226;
@@ -188,7 +188,7 @@
     }
     .add-btn { background: #00adb5; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-    ul.item-list { list-style: none; max-height: 180px; overflow-y: auto; }
+    ul.item-list { list-style: none; max-height: 220px; overflow-y: auto; }
     ul.item-list li {
       display: flex;
       justify-content: space-between;
@@ -256,7 +256,6 @@
 
     .custom-row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.75rem; }
 
-    /* Flashcards */
     .flashcard {
       background: #3e3e4a;
       padding: 20px;
@@ -270,7 +269,6 @@
       margin-bottom: 8px;
     }
 
-    /* Punições e Status Negativos */
     .debuff-banner {
       background: #e63946;
       color: white;
@@ -282,7 +280,6 @@
       display: none;
     }
 
-    /* Estilos Adicionais para o Seletor de Sons Lofi/Ruídos */
     .audio-panel {
       background: #222226;
       border-radius: 10px;
@@ -323,7 +320,7 @@
     <div class="mascot-container">
       <img id="mascot" class="mascot" src="Professor_neutro.png" alt="Mascote">
     </div>
-    <div id="speech" class="speech-bubble">O conhecimento é a sua maior arma no RPG da vida!</div>
+    <div id="speech" class="speech-bubble">A constância é a sua maior arma para conquistar a farda do ITA/IME!</div>
 
     <!-- Seletor de Temporizador -->
     <div class="custom-row" style="margin-bottom: 8px;">
@@ -331,15 +328,15 @@
       <select id="selectTimerDuration" onchange="changeTimerDuration(this.value)">
         <option value="15">15 Minutos (Rápido)</option>
         <option value="25">25 Minutos (Pomodoro)</option>
-        <option value="30">30 Minutos (Médio)</option>
-        <option value="50" selected>50 Minutos (Padrão)</option>
-        <option value="90">90 Minutos (Hardcore)</option>
+        <option value="50">50 Minutos (Padrão)</option>
+        <option value="90" selected>90 Minutos (Bloco Exatas ITA)</option>
+        <option value="120">120 Minutos (Carga Máxima FASE 4)</option>
       </select>
     </div>
 
     <!-- Timer -->
     <div id="activeSubjectLabel" style="font-size:0.8rem; color:#00adb5; font-weight:bold; height:16px;"></div>
-    <div id="timer" class="timer">50:00</div>
+    <div id="timer" class="timer">90:00</div>
 
     <!-- Controles & Áudio/Hardcore -->
     <div class="buttons" style="margin-bottom: 10px;">
@@ -391,37 +388,66 @@
 
   <!-- Abas de Navegação -->
   <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('cronograma')">📅 Cronograma</button>
+    <button class="tab-btn active" onclick="switchTab('cronograma')">📅 Cronograma ITA</button>
+    <button class="tab-btn" onclick="switchTab('radar')">🕸️ Teia do Conhecimento</button>
     <button class="tab-btn" onclick="switchTab('punicoes')">⚖️ Tribunal / Punições</button>
     <button class="tab-btn" onclick="switchTab('ranking')">👑 Ranking</button>
     <button class="tab-btn" onclick="switchTab('boss')">🐉 Chefe Semanal</button>
     <button class="tab-btn" onclick="switchTab('skills')">🌳 Habilidades</button>
     <button class="tab-btn" onclick="switchTab('flashcards')">🎴 Flashcards</button>
-    <button class="tab-btn" onclick="switchTab('livros')">📖 Livros & Capítulos</button>
-    <button class="tab-btn" onclick="switchTab('radar')">🕸️ Radar</button>
+    <button class="tab-btn" onclick="switchTab('livros')">📖 Capítulos</button>
     <button class="tab-btn" onclick="switchTab('questoes')">📝 Questões</button>
-    <button class="tab-btn" onclick="switchTab('loja')">🏆 Loja (100)</button>
+    <button class="tab-btn" onclick="switchTab('loja')">🏆 Loja</button>
     <button class="tab-btn" onclick="switchTab('sala')">🏫 Sala Virtual</button>
     <button class="tab-btn" onclick="switchTab('saude')">💧 Treino & Água</button>
-    <button class="tab-btn" onclick="switchTab('metas')">🎯 Meta/Corte</button>
+    <button class="tab-btn" onclick="switchTab('metas')">🎯 Meta ITA</button>
   </div>
 
   <!-- Card Principal com Conteúdos -->
   <div class="card">
     
-    <!-- ABA 1: CRONOGRAMA -->
+    <!-- ABA 1: CRONOGRAMA PROGRESSIVO ITA/IME -->
     <div id="tab-cronograma" class="tab-content active">
+      <div class="box-section">
+        <div class="box-title">⚙️ Seleção da Fase de Progresso:</div>
+        <select id="selectPhase" onchange="changePhase(this.value)" style="margin-bottom:8px;">
+          <option value="1">FASE 1: Construção de Base (3h/dia - Sem. 1 e 2)</option>
+          <option value="2">FASE 2: Consolidação (4,5h/dia - Sem. 3 e 4)</option>
+          <option value="3">FASE 3: Aprofundamento (6h/dia - Sem. 5 e 6)</option>
+          <option value="4">FASE 4: Performance Máxima (7h/dia - Sem. 7+)</option>
+        </select>
+        
+        <div id="weekSubSelector" style="display:none; margin-bottom:6px;">
+          <select id="selectWeek" onchange="renderScheduleUI()">
+            <option value="1">Semana 1</option>
+            <option value="2">Semana 2</option>
+          </select>
+        </div>
+      </div>
+
       <div class="box-section">
         <div class="box-title">📅 Blocos de Hoje (<span id="currentDayName"></span>):</div>
         <ul id="scheduleList" class="item-list"></ul>
       </div>
       <div class="box-section">
-        <div class="box-title">⚠️ Atrasados / Pendências:</div>
+        <div class="box-title">⚠️ Pendências do Plano:</div>
         <ul id="pendingList" class="item-list"></ul>
       </div>
     </div>
 
-    <!-- ABA NOVA: TRIBUNAL E PUNIÇÕES DE ESTUDO -->
+    <!-- ABA RADAR DE CONHECIMENTO (TEIA TODAS AS MATÉRIAS) -->
+    <div id="tab-radar" class="tab-content">
+      <div class="box-section">
+        <div class="box-title">🕸️ Teia do Conhecimento Geral:</div>
+        <canvas id="radarChart" width="300" height="300"></canvas>
+      </div>
+      <div class="box-section">
+        <div class="box-title">📈 Análise de Domínio Por Matéria:</div>
+        <div id="subjectBars" style="text-align:left; font-size:0.75rem;"></div>
+      </div>
+    </div>
+
+    <!-- ABA: TRIBUNAL E PUNIÇÕES -->
     <div id="tab-punicoes" class="tab-content">
       <div class="box-section">
         <div class="box-title">⚖️ Registrar "Pecado" de Estudo:</div>
@@ -441,7 +467,7 @@
       </div>
     </div>
 
-    <!-- ABA 2: RANKING DINÂMICO & MENSAGENS DOS RIVAIS -->
+    <!-- ABA: RANKING DINÂMICO -->
     <div id="tab-ranking" class="tab-content">
       <div class="box-section">
         <div class="box-title">💬 Provocação do Líder:</div>
@@ -472,18 +498,18 @@
       </div>
     </div>
 
-    <!-- ABA 3: BATALHA DE CHEFE SEMANAL -->
+    <!-- ABA: BATALHA DE CHEFE SEMANAL -->
     <div id="tab-boss" class="tab-content">
       <div class="box-section">
         <div class="box-title">👾 Simulado Final da Semana:</div>
-        <h4 id="bossName" style="color: #ff4757; margin-bottom: 6px;">O Monstro do Enem</h4>
+        <h4 id="bossName" style="color: #ff4757; margin-bottom: 6px;">O Monstro do ITA/IME</h4>
         <p style="font-size:0.75rem;">Vida do Boss: <strong id="bossHpDisplay">1000/1000</strong></p>
         <div class="progress-bar-bg"><div id="bossHpBar" class="progress-bar-fill boss-fill"></div></div>
-        <p style="font-size: 0.7rem; color: #aaa; margin-top: 6px;">* Complete blocos de estudo e responda questões para causar dano ao Chefe!</p>
+        <p style="font-size: 0.7rem; color: #aaa; margin-top: 6px;">* Complete blocos do Rufino, Tópicos de Física e Poliedro para derrotar o chefe!</p>
       </div>
     </div>
 
-    <!-- ABA 4: ÁRVORE DE HABILIDADES / SKILL TREE -->
+    <!-- ABA: ÁRVORE DE HABILIDADES -->
     <div id="tab-skills" class="tab-content">
       <div class="box-section">
         <div class="box-title">🌳 Passivas e Atributos:</div>
@@ -491,7 +517,7 @@
       </div>
     </div>
 
-    <!-- ABA 5: FLASHCARDS COM REPETIÇÃO ESPAÇADA -->
+    <!-- ABA: FLASHCARDS -->
     <div id="tab-flashcards" class="tab-content">
       <div class="box-section">
         <div class="box-title">🎴 Revisão Ativa:</div>
@@ -505,16 +531,16 @@
       </div>
       <div class="box-section">
         <div class="box-title">➕ Criar Flashcard:</div>
-        <input type="text" id="fcFront" placeholder="Pergunta" style="margin-bottom:4px;">
-        <input type="text" id="fcBack" placeholder="Resposta" style="margin-bottom:4px;">
+        <input type="text" id="fcFront" placeholder="Pergunta (Ex: Fórmula de Torricelli)" style="margin-bottom:4px;">
+        <input type="text" id="fcBack" placeholder="Resposta (Ex: v² = v0² + 2aΔs)" style="margin-bottom:4px;">
         <button class="add-btn" style="width:100%;" onclick="addFlashcard()">Salvar Cartão</button>
       </div>
     </div>
 
-    <!-- ABA 6: LIVROS & CAPÍTULOS POR MATÉRIA -->
+    <!-- ABA: LIVROS & CAPÍTULOS POR MATÉRIA -->
     <div id="tab-livros" class="tab-content">
       <div class="box-section">
-        <div class="box-title">📊 Progresso Geral dos Capítulos:</div>
+        <div class="box-title">📊 Progresso Geral dos Livros da Base:</div>
         <div style="font-size: 0.75rem; margin-bottom: 4px; display:flex; justify-content:space-between;">
           <span>Concluídos: <strong id="totalCapCompleted">0</strong> / <span id="totalCapCount">188</span></span>
           <span id="capPercent">0%</span>
@@ -523,45 +549,23 @@
       </div>
 
       <div class="box-section">
-        <div class="box-title">📖 Capítulos Programados para Hoje:</div>
-        <ul id="todayChaptersList" class="item-list"></ul>
-      </div>
-
-      <div class="box-section">
-        <div class="box-title">📚 Capítulos Concluídos por Matéria:</div>
+        <div class="box-title">📚 Coleções e Livros Ativos:</div>
         <ul id="subjectsChaptersList" class="item-list"></ul>
       </div>
     </div>
 
-    <!-- ABA 7: RADAR DE CONHECIMENTO -->
-    <div id="tab-radar" class="tab-content">
-      <div class="box-section">
-        <div class="box-title">🕸️ Teia de Conhecimento:</div>
-        <canvas id="radarChart" width="300" height="300"></canvas>
-      </div>
-      <div class="box-section">
-        <div class="box-title">📈 Desempenho Relatório:</div>
-        <p style="font-size: 0.75rem;" id="reportStats">Mais Estudado: - | Precisando de Foco: -</p>
-      </div>
-    </div>
-
-    <!-- ABA 8: CONVERSOR DE QUESTÕES EN XP -->
+    <!-- ABA: CONVERSOR DE QUESTÕES EN XP -->
     <div id="tab-questoes" class="tab-content">
       <div class="box-section">
         <div class="box-title">📝 Registrar Questões Resolvidas:</div>
         <div class="input-group">
           <select id="questMat">
-            <option value="Matemática">Matemática</option>
-            <option value="Física">Física</option>
-            <option value="Química">Química</option>
-            <option value="Português">Língua Portuguesa</option>
-            <option value="Biologia">Biologia</option>
-            <option value="História">História</option>
-            <option value="Geografia">Geografia</option>
-            <option value="Redação">Redação</option>
-            <option value="Inglês">Inglês</option>
-            <option value="Sociologia">Sociologia</option>
-            <option value="Filosofia">Filosofia</option>
+            <option value="Matemática">Matemática (Rufino / TQM)</option>
+            <option value="Física">Física (Tópicos de Física)</option>
+            <option value="Química">Química (Poliedro / Brady)</option>
+            <option value="Sociologia">Sociologia (Poliedro)</option>
+            <option value="Português/Redação">Português e Redação</option>
+            <option value="Humanas">Humanas Gerais</option>
           </select>
         </div>
         <div class="input-group">
@@ -571,7 +575,7 @@
       </div>
     </div>
 
-    <!-- ABA 9: LOJA DE 100 CONQUISTAS -->
+    <!-- ABA: LOJA DE 100 CONQUISTAS -->
     <div id="tab-loja" class="tab-content">
       <div class="box-section">
         <div class="box-title">🏆 Loja de Conquistas (Gaste XP):</div>
@@ -579,7 +583,7 @@
       </div>
     </div>
 
-    <!-- ABA 10: SALA DE AULA VIRTUAL -->
+    <!-- ABA: SALA DE AULA VIRTUAL -->
     <div id="tab-sala" class="tab-content">
       <div class="box-section">
         <div class="box-title">🏫 Colegas Estudando Agora:</div>
@@ -587,15 +591,15 @@
       </div>
     </div>
 
-    <!-- ABA 11: SAÚDE E HÁBITOS -->
+    <!-- ABA: SAÚDE E HÁBITOS -->
     <div id="tab-saude" class="tab-content">
       <div class="box-section">
         <div class="box-title">💧 Hidratação Diária:</div>
-        <p>Consumido: <strong id="waterCount">0</strong> / 2000 ml</p>
+        <p>Consumido: <strong id="waterCount">0</strong> / 2500 ml</p>
         <button class="main-btn" style="margin-top:6px; background:#00adb5;" onclick="addWater(250)">+ 250ml de Água</button>
       </div>
       <div class="box-section">
-        <div class="box-title">🏋️ Rotina de Treino:</div>
+        <div class="box-title">🏋️ Rotina de Exercícios / Treino:</div>
         <div class="input-group">
           <input type="text" id="workoutInput" placeholder="Ex: Flexões / Corrida">
           <button class="add-btn" onclick="addWorkout()">Add</button>
@@ -604,11 +608,11 @@
       </div>
     </div>
 
-    <!-- ABA 12: CALCULADORA DE CORTE -->
+    <!-- ABA: CALCULADORA DE CORTE -->
     <div id="tab-metas" class="tab-content">
       <div class="box-section">
         <div class="box-title">🎯 Nota de Corte / Objetivo:</div>
-        <input type="number" id="targetScore" placeholder="Ex: 750 (Nota de Corte)" style="margin-bottom:6px;">
+        <input type="number" id="targetScore" placeholder="Ex: 80 (Meta de Acertos ITA)" style="margin-bottom:6px;">
         <button class="add-btn" style="width:100%;" onclick="saveTargetScore()">Salvar Meta</button>
         <p style="margin-top:8px; font-size:0.75rem;" id="targetScoreStatus">Sua Pontuação RPG Estimada: 0</p>
       </div>
@@ -628,7 +632,6 @@
     function runSplashScreen() {
       const splashScreen = document.getElementById("splashScreen");
       const splashText = document.getElementById("splashText");
-
       const randomIndex = Math.floor(Math.random() * splashQuotes.length);
       const chosenQuote = splashQuotes[randomIndex];
 
@@ -648,13 +651,13 @@
 
     window.addEventListener("DOMContentLoaded", runSplashScreen);
 
-    // Efeitos Sonoros / Áudios
+    // Efeitos Sonoros
     const AUDIO_CLICK = new Audio("https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3");
     const AUDIO_LEVELUP = new Audio("https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3");
     const AUDIO_BRONCA = new Audio("https://assets.mixkit.co/active_storage/sfx/2874/2874-preview.mp3");
     const AUDIO_SUCESSO = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
 
-    // Lofi e Gerador de Ruídos Ambientes Ampliado
+    // Som de Fundo
     const audioSources = {
       lofi1: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
       lofi2: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
@@ -669,36 +672,22 @@
     const lofiAudio = new Audio(audioSources[currentAudioKey]);
     lofiAudio.loop = true;
     let isLofiPlaying = false;
-
-    // Gerador Sintético WebAudio API de Suporte (Sintetizador de Ruído Branco/Rosa Puro)
-    let audioCtx = null;
-    let noiseNode = null;
-    let isSyntheticNoise = false;
+    let audioCtx = null, noiseNode = null, isSyntheticNoise = false;
 
     function changeAudioSource(key) {
       currentAudioKey = key;
-      if (isSyntheticNoise) {
-        stopSyntheticNoise();
-      }
-      
+      if (isSyntheticNoise) stopSyntheticNoise();
       if (key === "white" || key === "pink") {
-        if (isLofiPlaying) {
-          lofiAudio.pause();
-          playSyntheticNoise(key);
-        }
+        if (isLofiPlaying) { lofiAudio.pause(); playSyntheticNoise(key); }
       } else {
         lofiAudio.src = audioSources[key];
-        if (isLofiPlaying) {
-          lofiAudio.play().catch(() => {});
-        }
+        if (isLofiPlaying) lofiAudio.play().catch(() => {});
       }
     }
 
     function setAudioVolume(val) {
       lofiAudio.volume = parseFloat(val);
-      if (noiseNode && noiseNode.gainNode) {
-        noiseNode.gainNode.gain.value = parseFloat(val) * 0.1;
-      }
+      if (noiseNode && noiseNode.gainNode) noiseNode.gainNode.gain.value = parseFloat(val) * 0.1;
     }
 
     function toggleLofi() {
@@ -708,11 +697,8 @@
         isLofiPlaying = false;
         document.getElementById("btnLofi").style.background = "#a55eea";
       } else {
-        if (currentAudioKey === "white" || currentAudioKey === "pink") {
-          playSyntheticNoise(currentAudioKey);
-        } else {
-          lofiAudio.play().catch(() => {});
-        }
+        if (currentAudioKey === "white" || currentAudioKey === "pink") playSyntheticNoise(currentAudioKey);
+        else lofiAudio.play().catch(() => {});
         isLofiPlaying = true;
         document.getElementById("btnLofi").style.background = "#2ed573";
       }
@@ -720,65 +706,42 @@
 
     function playSyntheticNoise(type) {
       try {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         stopSyntheticNoise();
-        
         const bufferSize = audioCtx.sampleRate * 2;
         const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
         const data = buffer.getChannelData(0);
-        
-        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-
+        let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0;
         for (let i = 0; i < bufferSize; i++) {
           const white = Math.random() * 2 - 1;
           if (type === "pink") {
-            b0 = 0.99886 * b0 + white * 0.0555179;
-            b1 = 0.99332 * b1 + white * 0.0750759;
-            b2 = 0.96900 * b2 + white * 0.1538520;
-            b3 = 0.86650 * b3 + white * 0.3104856;
-            b4 = 0.55000 * b4 + white * 0.5329522;
-            b5 = -0.7616 * b5 - white * 0.0168980;
+            b0 = 0.99886 * b0 + white * 0.0555179; b1 = 0.99332 * b1 + white * 0.0750759;
+            b2 = 0.96900 * b2 + white * 0.1538520; b3 = 0.86650 * b3 + white * 0.3104856;
+            b4 = 0.55000 * b4 + white * 0.5329522; b5 = -0.7616 * b5 - white * 0.0168980;
             data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-            data[i] *= 0.11;
-            b6 = white * 0.115926;
-          } else {
-            data[i] = white;
-          }
+            data[i] *= 0.11; b6 = white * 0.115926;
+          } else { data[i] = white; }
         }
-
         const noiseSrc = audioCtx.createBufferSource();
-        noiseSrc.buffer = buffer;
-        noiseSrc.loop = true;
-
+        noiseSrc.buffer = buffer; noiseSrc.loop = true;
         const gainNode = audioCtx.createGain();
-        const currentVol = parseFloat(document.getElementById("audioVolume").value) || 0.5;
-        gainNode.gain.value = currentVol * 0.1;
-
-        noiseSrc.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
+        gainNode.gain.value = (parseFloat(document.getElementById("audioVolume").value) || 0.5) * 0.1;
+        noiseSrc.connect(gainNode); gainNode.connect(audioCtx.destination);
         noiseSrc.start();
-
         noiseNode = { source: noiseSrc, gainNode: gainNode };
         isSyntheticNoise = true;
       } catch(e) {}
     }
 
     function stopSyntheticNoise() {
-      if (noiseNode && noiseNode.source) {
-        try { noiseNode.source.stop(); } catch(e){}
-        noiseNode = null;
-      }
+      if (noiseNode && noiseNode.source) { try { noiseNode.source.stop(); } catch(e){} noiseNode = null; }
       isSyntheticNoise = false;
     }
 
-    // Estados Globais
-    let selectedMinutes = parseInt(localStorage.getItem("selectedMinutes")) || 50;
+    // Estados Globais do Usuário
+    let selectedMinutes = parseInt(localStorage.getItem("selectedMinutes")) || 90;
     let timeLeft = selectedMinutes * 60;
-    let timerInterval = null;
-    let isPaused = false;
-    let currentStudyingSubject = "";
+    let timerInterval = null, isPaused = false, currentStudyingSubject = "";
 
     let userLevel = parseInt(localStorage.getItem("userLevel")) || 1;
     let userXP = parseInt(localStorage.getItem("userXP")) || 0;
@@ -790,20 +753,75 @@
     let bossHp = parseInt(localStorage.getItem("bossHp")) || 1000;
     let hardcoreMode = false;
     let activeDebuffBlocks = parseInt(localStorage.getItem("activeDebuffBlocks")) || 0;
+    let activePhase = parseInt(localStorage.getItem("activePhase")) || 1;
 
-    // Mascote: Estados/Imagens (Neutro, Bravo, Estudando)
-    function setMascotState(state) {
-      const mascotImg = document.getElementById("mascot");
-      if (state === "bravo") {
-        mascotImg.src = "Professor_bravo.png";
-      } else if (state === "estudando") {
-        mascotImg.src = "Professor_estudando.png";
-      } else {
-        mascotImg.src = "Professor_neutro.png";
+    // MATÉRIAS E TEIA DO CONHECIMENTO COMPLETA
+    let knowledgeStats = JSON.parse(localStorage.getItem("knowledgeStats")) || {
+      "Matemática": 10,
+      "Física": 10,
+      "Química": 10,
+      "Sociologia": 10,
+      "Português/Redação": 10,
+      "Humanas": 10
+    };
+
+    // NOVO CRONOGRAMA PROGRESSIVO COMPLETO (FASE 1 A 4)
+    const fullScheduleData = {
+      1: { // FASE 1 (3h por dia)
+        1: { // Semana 1
+          1: ["Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Conjuntos Numéricos e Reais)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 1 (Cinemática e Referencial)"],
+          2: ["Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Potenciação e Radiciação)", "Química (1h30): Poliedro Livro 2 – Frente 1 Cap. 4 (Estados da Matéria)"],
+          3: ["Física (1h30): Tópicos de Física Vol. 1 – Tópico 1 (Deslocamento e Vel. Média)", "Matemática (1h30): Rufino Vol. 0 – Exercícios Potenciação (Nível 1)"],
+          4: ["Química (1h30): Poliedro Livro 2 – Frente 1 Cap. 4 (Forças Intermoleculares)", "Sociologia (1h30): Poliedro Sociologia – Cap. 1 (Olhar Sociológico)"],
+          5: ["Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Operações Algébricas e Produtos Notáveis)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 2 (Movimento Uniforme)"],
+          6: ["Matemática/Física (3h): Revisão semanal e Exercícios (Rufino Cap. 1 / Tópicos 1 e 2)"],
+          0: ["Descanso Total 🎉"]
+        },
+        2: { // Semana 2
+          1: ["Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Produtos Notáveis Complexos e Fatoração)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 2 (Exercícios MU Nível 1 e 2)"],
+          2: ["Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Fatoração: Soma e Diferença de Cubos)", "Química (1h30): Poliedro Livro 2 – Frente 2 Cap. 4 (Teoria de Arrhenius e Ácidos)"],
+          3: ["Física (1h30): Tópicos de Física Vol. 1 – Tópico 3 (MUV: Aceleração e Equações)", "Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Exercícios Fatoração Militares)"],
+          4: ["Química (1h30): Poliedro Livro 2 – Frente 2 Cap. 4 (Nomenclatura dos Ácidos)", "Sociologia (1h30): Poliedro Sociologia – Cap. 2 (Origens e Rev. Industrial)"],
+          5: ["Matemática (1h30): Rufino Vol. 0 – Cap. 2 (M.D.C e M.M.C de Polinômios)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 3 (Torricelli e Gráficos MUV)"],
+          6: ["Revisão Ativa (3h): Exercícios Tópicos de Física (Nível 2) e Rufino"],
+          0: ["Descanso Total 🎉"]
+        }
+      },
+      2: { // FASE 2 (4.5h por dia)
+        3: {
+          1: ["Matemática (1h30): Rufino Vol. 0 – Cap. 3 (Equações 1º Grau e Sistemas)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 3 (Queda Livre e Lançamento)", "Química (1h30): Poliedro Livro 2 – Frente 2 Cap. 4 (Bases e Hidróxidos)"],
+          2: ["Matemática (1h30): Rufino Vol. 0 – Cap. 3 (Equações 2º Grau e Girard)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 4 (Movimento Circular)", "Sociologia (1h30): Poliedro Sociologia – Cap. 3 (Émile Durkheim)"],
+          3: ["Matemática (1h30): Rufino Vol. 0 – Cap. 3 (Inequações 1º e 2º Grau)", "Química (1h30): Poliedro Livro 2 – Frente 2 Cap. 5 (Sais e Neutralização)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 4 (Engrenagens e Polias)"],
+          4: ["Matemática (1h30): Tópicos de Álgebra Elementar (Produtos e Inequações)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 5 (Vetores e Decomposição)", "Química (1h30): Poliedro Livro 2 – Frente 2 Cap. 5 (Óxidos)"],
+          5: ["Matemática (1h30): TQM Ensino Médio (Exercícios de Fixação)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 5 (Cinemática Vetorial)", "Revisão/Redação (1h30): Leitura e Estrutura Redação Militar"],
+          6: ["Bloco Intensivo Exercícios (4h30): Tópicos de Física (Nível 2 e 3) e Rufino Cap. 1-3"],
+          0: ["Descanso Total 🎉"]
+        }
+      },
+      3: { // FASE 3 (6h por dia)
+        5: {
+          1: ["Matemática (2h): Rufino Vol. 0 – Cap. 4 (Sistema Métrico e Frações)", "Física (2h): Tópicos de Física Vol. 1 – Unid II Tópico 1 (1ª e 2ª Leis de Newton)", "Química (2h): Poliedro Livro 2 – Frente 1 Cap. 5 (Orgânica e Carbono)"],
+          2: ["Matemática (2h): Rufino Vol. 0 – Cap. 4 (Razão e Proporção)", "Física (2h): Tópicos de Física Vol. 1 – Unid II Tópico 1 (3ª Lei e Blocos)", "Química (2h): Poliedro Livro 2 – Frente 1 Cap. 5 (Cadeias Carbônicas)"],
+          3: ["Matemática (2h): TQM Ensino Médio – Fatoração e Inequações (CN/EPCAR/ITA)", "Física (2h): Tópicos de Física Vol. 1 – Unid II Tópico 2 (Atrito Estático/Cinético)", "Química (2h): Poliedro Livro 2 – Frente 1 Cap. 6 (Nomenclatura Hidrocarbonetos)"],
+          4: ["Matemática (2h): TQM Ensino Médio – Funções (Conceito, Domínio, Imagem)", "Física (2h): Tópicos de Física Vol. 1 – Unid II Tópico 3 (Centrípeta e Curvas)", "Sociologia/Humanas (2h): Poliedro Sociologia – Cap. 4 e 5 (Weber e Marx)"],
+          5: ["Matemática (2h): TQM Ensino Médio – Funções Injetoras, Bijetoras e Inversas", "Física (2h): Tópicos de Física Vol. 1 – Unid II Tópico 4 (Gravitação Universal)", "Química (2h): Poliedro Livro 2 – Frente 1 Cap. 6 (Funções Oxigenadas)"],
+          6: ["Resolução ITA/IME (4h): Lista Leis de Newton, Atrito e TQM", "Análise Gabaritos RES1 (2h): Consulta de Resoluções Detalhadas"],
+          0: ["Descanso Total 🎉"]
+        }
+      },
+      4: { // FASE 4 (7h por dia - Alta Performance)
+        7: {
+          1: ["Bloco 1 (2h): Matemática Teoria + Exercícios (TQM / Álgebra)", "Bloco 2 (2h): Física Teoria + Exercícios Nível 2/3 (Tópicos de Física)", "Bloco 3 (1h30): Química Teoria + Aprofundamento (Poliedro / Brady)", "Bloco 4 (1h30): Questões Militares ITA/IME / Português"],
+          2: ["Bloco 1 (2h): Geometria Plana Avançada (Triângulos e Círculos)", "Bloco 2 (2h): Física - Trabalho, Potência e Energia", "Bloco 3 (1h30): Química - Isomeria Plana e Espacial", "Bloco 4 (1h30): Treino Intenso de Questões ITA"],
+          3: ["Bloco 1 (2h): Trigonometria Avançada e Equações", "Bloco 2 (2h): Física - Impulso e Colisões", "Bloco 3 (1h30): Química - Soluções e Concentrações", "Bloco 4 (1h30): Redação Militar e Humanas"],
+          4: ["Bloco 1 (2h): Análise Combinatória e Binômio de Newton", "Bloco 2 (2h): Física Vol. 2 - Termometria e Calorimetria", "Bloco 3 (1h30): Físico-Química - Termodinâmica Química", "Bloco 4 (1h30): Provas Anteriores ITA/IME"],
+          5: ["Bloco 1 (2h): Probabilidade e Matrizes Avançadas", "Bloco 2 (2h): Física - Gases Perfeitos e Termodinâmica", "Bloco 3 (1h30): Química Orgânica Aprofundada", "Bloco 4 (1h30): Simulado de Velocidade"],
+          6: ["Simulado Completo ITA/IME (5h)", "Análise de Erros e RES PDFs (2h)"],
+          0: ["Descanso Ativo e Recuperação Mental 🎉"]
+        }
       }
-    }
+    };
 
-    // Rivais & Ranking
     let competitors = JSON.parse(localStorage.getItem("competitors")) || [
       { id: 0, name: "Você (Jogador)", level: 1, xp: 0, isUser: true, avatar: "https://via.placeholder.com/150/00adb5/ffffff?text=Você" },
       { id: 1, name: "Isagi", level: 2, xp: 180, isUser: false, avatar: "https://via.placeholder.com/150/3e3e4a/ffffff?text=Isagi" },
@@ -813,44 +831,21 @@
       { id: 5, name: "Barou", level: 2, xp: 210, isUser: false, avatar: "https://via.placeholder.com/150/3e3e4a/ffffff?text=Barou" }
     ];
 
-    // Provocações dos Rivais
     const taunts = [
-      "Nagi: 'Você está realmente tentando me acompanhar? Que preguiça...'",
-      "Barou: 'Cai fora do meu caminho, você é só mais um coadjuvante!'",
-      "Isagi: 'Estou devorando cada matéria. É melhor você se mexer!'",
-      "Bachira: 'O meu monstro interno quer ver você estudar mais rápido!'"
+      "Nagi: 'Você está no Rufino ainda? Que preguiça...'",
+      "Barou: 'Cai fora! As questões de Física Nível 3 são minhas!'",
+      "Isagi: 'Estou devorando a frente de Físico-Química. Reaja!'",
+      "Bachira: 'O meu monstro interno quer ver você gabaritar o ITA!'"
     ];
 
-    // Capítulos
     let subjectChapters = JSON.parse(localStorage.getItem("subjectChapters")) || {
-      "TQM (Matemática Fund.)": { done: 0, total: 46 },
-      "TQM (Matemática Médio)": { done: 0, total: 20 },
-      "TQP (Português)": { done: 0, total: 10 },
-      "Física": { done: 0, total: 15 },
-      "Química": { done: 0, total: 12 },
-      "Biologia": { done: 0, total: 18 },
-      "Redação": { done: 0, total: 30 },
-      "Inglês": { done: 0, total: 16 },
-      "História": { done: 0, total: 13 },
-      "Geografia": { done: 0, total: 12 },
-      "Sociologia": { done: 0, total: 17 },
-      "Filosofia": { done: 0, total: 14 }
-    };
-
-    let knowledgeStats = JSON.parse(localStorage.getItem("knowledgeStats")) || {
-      "Matemática": 0, "Física": 0, "Química": 0, "Português": 0,
-      "Biologia": 0, "História": 0, "Geografia": 0, "Redação": 0,
-      "Inglês": 0, "Sociologia": 0, "Filosofia": 0
-    };
-
-    const weeklySchedule = JSON.parse(localStorage.getItem("weeklySchedule")) || {
-      1: ["Matemática (50m)", "Física (50m)", "Língua Portuguesa (50m)", "Matemática (50m)", "Química (50m)"],
-      2: ["Matemática (50m)", "Física (50m)", "História (50m)", "Matemática (50m)", "Geografia (50m)"],
-      3: ["Redação (50m)", "Redação Prática (50m)", "Biologia (50m)", "Língua Portuguesa (50m)", "Inglês (50m)"],
-      4: ["Matemática (50m)", "Física (50m)", "Química (50m)", "História (50m)", "Geografia (50m)"],
-      5: ["Matemática (50m)", "Química (50m)", "Biologia (50m)", "Inglês (50m)", "Sociologia (25m)", "Filosofia (25m)"],
-      6: ["Simulado (1h 30m)", "Correção do Simulado (1h)"],
-      0: ["Descanso Ativo / Leitura Leve"]
+      "Rufino Vol. 0 (Matemática)": { done: 0, total: 25 },
+      "TQM (Álgebra Ensino Médio)": { done: 0, total: 30 },
+      "Tópicos de Física Vol. 1": { done: 0, total: 35 },
+      "Tópicos de Física Vol. 2": { done: 0, total: 30 },
+      "Poliedro Química (Frente 1 e 2)": { done: 0, total: 40 },
+      "Poliedro Sociologia & Humanas": { done: 0, total: 15 },
+      "Português & Redação Militar": { done: 0, total: 20 }
     };
 
     let pendingTasks = JSON.parse(localStorage.getItem("pendingTasks")) || [];
@@ -859,22 +854,23 @@
     let unlockedSkills = JSON.parse(localStorage.getItem("unlockedSkills")) || [];
     let punishmentLog = JSON.parse(localStorage.getItem("punishmentLog")) || [];
 
-    // Flashcards Data
     let flashcards = JSON.parse(localStorage.getItem("flashcards")) || [
-      { front: "Qual a fórmula da velocidade média?", back: "V = Δs / Δt" },
-      { front: "Quem escreveu Dom Casmurro?", back: "Machado de Assis" }
+      { front: "Qual a 2ª Lei de Newton?", back: "F = m * a" },
+      { front: "O que é a equação de Torricelli?", back: "v² = v0² + 2aΔs" }
     ];
-    let currentCardIndex = 0;
-    let showingBack = false;
+    let currentCardIndex = 0, showingBack = false;
+    let radarChartInstance = null;
 
     const timerEl = document.getElementById("timer");
 
-    // Inicializações
+    // Inicialização da Aplicação
     changeTheme(currentTheme);
     document.getElementById("selectTheme").value = currentTheme;
     document.getElementById("selectTimerDuration").value = selectedMinutes;
+    document.getElementById("selectPhase").value = activePhase;
+
     updateDisplay();
-    initSchedule();
+    changePhase(activePhase);
     updateUI();
     renderRanking();
     renderClassroom();
@@ -885,10 +881,229 @@
     renderBoss();
     renderFlashcard();
     renderPunishments();
-
-    let radarChartInstance = null;
     initRadarChart();
 
+    function changePhase(val) {
+      activePhase = parseInt(val);
+      localStorage.setItem("activePhase", activePhase);
+      const sub = document.getElementById("weekSubSelector");
+      const selWeek = document.getElementById("selectWeek");
+
+      if (activePhase === 1) {
+        sub.style.display = "block";
+        selWeek.innerHTML = `<option value="1">Semana 1</option><option value="2">Semana 2</option>`;
+      } else if (activePhase === 2) {
+        sub.style.display = "block";
+        selWeek.innerHTML = `<option value="3">Semana 3</option><option value="4">Semana 4</option>`;
+      } else if (activePhase === 3) {
+        sub.style.display = "block";
+        selWeek.innerHTML = `<option value="5">Semana 5</option><option value="6">Semana 6</option>`;
+      } else {
+        sub.style.display = "none";
+      }
+
+      renderScheduleUI();
+    }
+
+    function renderScheduleUI() {
+      const dayIdx = new Date().getDay();
+      const daysNames = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+      document.getElementById("currentDayName").textContent = daysNames[dayIdx];
+
+      let weekIdx = 1;
+      if (activePhase === 1) weekIdx = document.getElementById("selectWeek").value || 1;
+      else if (activePhase === 2) weekIdx = 3;
+      else if (activePhase === 3) weekIdx = 5;
+      else weekIdx = 7;
+
+      const list = document.getElementById("scheduleList");
+      list.innerHTML = "";
+
+      const phaseObj = fullScheduleData[activePhase];
+      const weekObj = phaseObj ? phaseObj[weekIdx] : null;
+      const todayTasks = weekObj ? weekObj[dayIdx] : null;
+
+      if (!todayTasks || todayTasks.length === 0) {
+        list.innerHTML = `<li style="color:#2ed573;">Descanso ou Blocos Concluídos! 🎉</li>`;
+      } else {
+        todayTasks.forEach((item, index) => {
+          list.innerHTML += `<li>
+            <span style="font-size:0.75rem;">${item}</span>
+            <div style="display:flex; gap:4px;">
+              <button class="add-btn" style="background:#2ed573; padding:4px 6px;" onclick="startScheduleTask('${item}')">⏱️</button>
+              <button class="add-btn" style="padding:4px 6px;" onclick="completeScheduleTask(${index})">✓ (+50 XP)</button>
+            </div>
+          </li>`;
+        });
+      }
+
+      renderPending();
+    }
+
+    function startScheduleTask(subjectName) {
+      currentStudyingSubject = subjectName;
+      document.getElementById("activeSubjectLabel").textContent = `Foco: ${subjectName}`;
+      startTimer();
+    }
+
+    function completeScheduleTask(taskIdx) {
+      addXP(50);
+      reduceStress(10);
+      damageBoss(50);
+      AUDIO_SUCESSO.play();
+
+      let weekIdx = document.getElementById("selectWeek").value || 1;
+      if (activePhase === 2) weekIdx = 3;
+      if (activePhase === 3) weekIdx = 5;
+      if (activePhase === 4) weekIdx = 7;
+
+      const dayIdx = new Date().getDay();
+      if (fullScheduleData[activePhase][weekIdx][dayIdx]) {
+        fullScheduleData[activePhase][weekIdx][dayIdx].splice(taskIdx, 1);
+        renderScheduleUI();
+      }
+      alert("🎉 Bloco Concluído com sucesso! +50 XP adicionados!");
+    }
+
+    function renderPending() {
+      const list = document.getElementById("pendingList");
+      list.innerHTML = "";
+      if (pendingTasks.length === 0) {
+        list.innerHTML = `<li style="color:#2ed573;">Nenhuma pendência! Mantenha a marcha! 🎉</li>`;
+        return;
+      }
+      pendingTasks.forEach((task, idx) => {
+        list.innerHTML += `<li>
+          <span>${task}</span>
+          <button class="add-btn" onclick="clearPending(${idx})">✓ (+30 XP)</button>
+        </li>`;
+      });
+    }
+
+    function clearPending(idx) {
+      addXP(30);
+      pendingTasks.splice(idx, 1);
+      localStorage.setItem("pendingTasks", JSON.stringify(pendingTasks));
+      renderPending();
+    }
+
+    // TEIA DE CONHECIMENTO COMPLETA CORRIGIDA
+    function initRadarChart() {
+      const ctx = document.getElementById('radarChart').getContext('2d');
+      radarChartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: Object.keys(knowledgeStats),
+          datasets: [{
+            label: 'Domínio Por Matéria (%)',
+            data: Object.values(knowledgeStats),
+            backgroundColor: 'rgba(0, 173, 181, 0.25)',
+            borderColor: '#00adb5',
+            pointBackgroundColor: '#2ed573',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#00adb5'
+          }]
+        },
+        options: {
+          scales: {
+            r: {
+              angleLines: { color: 'rgba(255, 255, 255, 0.2)' },
+              grid: { color: 'rgba(255, 255, 255, 0.2)' },
+              pointLabels: { color: '#ffffff', font: { size: 11 } },
+              ticks: { display: false },
+              min: 0,
+              max: 100
+            }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+      renderSubjectBars();
+    }
+
+    function renderSubjectBars() {
+      const container = document.getElementById("subjectBars");
+      container.innerHTML = "";
+      for (let sub in knowledgeStats) {
+        const val = knowledgeStats[sub];
+        container.innerHTML += `<div style="margin-bottom:6px;">
+          <div style="display:flex; justify-space-between; margin-bottom:2px;">
+            <span>${sub}</span>
+            <strong>${val}%</strong>
+          </div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${val}%;"></div></div>
+        </div>`;
+      }
+    }
+
+    function submitQuestions() {
+      const subject = document.getElementById("questMat").value;
+      const count = parseInt(document.getElementById("questCount").value);
+      if (!count || count <= 0) return;
+
+      const gainedXP = count * 5;
+      addXP(gainedXP);
+      damageBoss(count * 10);
+
+      const targetKey = knowledgeStats.hasOwnProperty(subject) ? subject : "Matemática";
+      knowledgeStats[targetKey] = Math.min(knowledgeStats[targetKey] + Math.ceil(count / 2), 100);
+      localStorage.setItem("knowledgeStats", JSON.stringify(knowledgeStats));
+      
+      radarChartInstance.data.datasets[0].data = Object.values(knowledgeStats);
+      radarChartInstance.update();
+      renderSubjectBars();
+
+      document.getElementById("questCount").value = "";
+      alert(`🎉 +${gainedXP} XP obtidos por resolver ${count} questões de ${subject}!`);
+    }
+
+    // Punições e Tribunal
+    function applyPunishment() {
+      const sinType = document.getElementById("selectSinType").value;
+      AUDIO_BRONCA.play();
+      setMascotState("bravo");
+
+      let logText = "";
+      if (sinType === "distracao") {
+        userXP = Math.max(0, userXP - 30);
+        addStress(20);
+        logText = "Distração/Celular: -30 XP e +20% Estresse";
+        document.getElementById("speech").textContent = "Foco total! O ITA não tolera distrações com redes sociais!";
+      } else if (sinType === "procrastinacao") {
+        pendingTasks.push("Bloco Extra de Recuperação (Rufino/Tópicos)");
+        localStorage.setItem("pendingTasks", JSON.stringify(pendingTasks));
+        renderPending();
+        logText = "Procrastinação: Bloco Extra Pendente";
+        document.getElementById("speech").textContent = "Procrastinar acumula matéria. Recupere o tempo perdido!";
+      } else if (sinType === "desistência") {
+        activeDebuffBlocks = 2;
+        localStorage.setItem("activeDebuffBlocks", activeDebuffBlocks);
+        logText = "Desistência: Debuff Cansaço Mental (-20% XP por 2 blocos)";
+        document.getElementById("speech").textContent = "Você desistiu no meio do bloco! Debuff ativado!";
+      }
+
+      punishmentLog.unshift(`${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})} - ${logText}`);
+      localStorage.setItem("punishmentLog", JSON.stringify(punishmentLog));
+      
+      updateUI();
+      renderPunishments();
+      alert(`⚠️ Punição Aplicada: ${logText}`);
+    }
+
+    function renderPunishments() {
+      const list = document.getElementById("punishmentHistory");
+      list.innerHTML = "";
+      if (punishmentLog.length === 0) {
+        list.innerHTML = `<li style="color:#2ed573;">Nenhum pecado de estudo registrado! Perfeito!</li>`;
+      } else {
+        punishmentLog.forEach(item => {
+          list.innerHTML += `<li style="color:#ff5252;">${item}</li>`;
+        });
+      }
+    }
+
+    // Funções do Temporizador
     function changeTimerDuration(val) {
       if (timerInterval) return;
       selectedMinutes = parseInt(val);
@@ -911,92 +1126,131 @@
       document.getElementById(`tab-${tabId}`).classList.add("active");
     }
 
-    // Cronograma & Ganho de XP
-    function initSchedule() {
-      const dayIdx = new Date().getDay();
-      const daysNames = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-      document.getElementById("currentDayName").textContent = daysNames[dayIdx];
+    function setMascotState(state) {
+      const mascotImg = document.getElementById("mascot");
+      if (state === "bravo") mascotImg.src = "Professor_bravo.png";
+      else if (state === "estudando") mascotImg.src = "Professor_estudando.png";
+      else mascotImg.src = "Professor_neutro.png";
+    }
 
-      const list = document.getElementById("scheduleList");
-      list.innerHTML = "";
-      
-      if (!weeklySchedule[dayIdx] || weeklySchedule[dayIdx].length === 0) {
-        list.innerHTML = `<li style="color:#2ed573;">Todos os blocos de hoje foram concluídos! 🎉</li>`;
+    function startTimer() {
+      if (timerInterval) return;
+      setMascotState("estudando");
+      document.getElementById("speech").textContent = "Foco total na teoria e nos exercícios agora!";
+      document.getElementById("selectTimerDuration").disabled = true;
+      document.getElementById("btnStart").style.display = "none";
+      document.getElementById("btnPause").style.display = "block";
+      document.getElementById("btnFinish").style.display = "block";
+      document.getElementById("btnCancel").style.display = "block";
+
+      timerInterval = setInterval(() => {
+        if (!isPaused) {
+          timeLeft--;
+          updateDisplay();
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            finishTimer();
+          }
+        }
+      }, 1000);
+    }
+
+    function updateDisplay() {
+      const m = Math.floor(timeLeft / 60);
+      const s = timeLeft % 60;
+      timerEl.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function pauseTimer() {
+      isPaused = !isPaused;
+      document.getElementById("btnPause").textContent = isPaused ? "Retomar" : "Pausar";
+      if (isPaused) {
+        setMascotState("bravo");
+        document.getElementById("speech").textContent = "Pausou? Seus concorrentes do ITA continuam estudando!";
       } else {
-        weeklySchedule[dayIdx].forEach((item, index) => {
-          list.innerHTML += `<li>
-            <span style="font-size:0.75rem;">${item}</span>
-            <div style="display:flex; gap:4px;">
-              <button class="add-btn" style="background:#2ed573; padding:4px 6px;" onclick="startScheduleTask('${item}')">⏱️</button>
-              <button class="add-btn" style="padding:4px 6px;" onclick="completeScheduleTask(${dayIdx}, ${index})">✓ (+50 XP)</button>
-            </div>
-          </li>`;
-        });
+        setMascotState("estudando");
       }
-
-      renderPending();
     }
 
-    function startScheduleTask(subjectName) {
-      currentStudyingSubject = subjectName;
-      document.getElementById("activeSubjectLabel").textContent = `Estudando: ${subjectName}`;
-      startTimer();
-    }
-
-    function completeScheduleTask(dayIdx, taskIdx) {
-      addXP(50);
-      reduceStress(10);
-      damageBoss(50);
+    function finishTimer() {
+      clearInterval(timerInterval);
       AUDIO_SUCESSO.play();
-      weeklySchedule[dayIdx].splice(taskIdx, 1);
-      localStorage.setItem("weeklySchedule", JSON.stringify(weeklySchedule));
-      initSchedule();
-      alert("🎉 Bloco do Cronograma Concluído! +50 XP adicionados!");
-    }
-
-    function renderPending() {
-      const list = document.getElementById("pendingList");
-      list.innerHTML = "";
-      if (pendingTasks.length === 0) {
-        list.innerHTML = `<li style="color:#2ed573;">Nenhuma pendência acumulada! 🎉</li>`;
-        return;
+      
+      let gainedXP = Math.floor(selectedMinutes * 2);
+      if (unlockedSkills.includes("boostXp")) gainedXP = Math.floor(gainedXP * 1.2);
+      if (activeDebuffBlocks > 0) {
+        gainedXP = Math.floor(gainedXP * 0.8);
+        activeDebuffBlocks--;
+        localStorage.setItem("activeDebuffBlocks", activeDebuffBlocks);
       }
-      pendingTasks.forEach((task, idx) => {
-        list.innerHTML += `<li>
-          <span>${task}</span>
-          <button class="add-btn" onclick="clearPending(${idx})">✓ (+30 XP)</button>
-        </li>`;
-      });
+
+      addXP(gainedXP);
+      reduceStress(20);
+      damageBoss(100);
+
+      setMascotState("neutro");
+      document.getElementById("speech").textContent = "Excelente! Mais um bloco rumo à aprovação concluído!";
+      alert(`✨ Bloco de ${selectedMinutes} min concluído! +${gainedXP} XP!`);
+      resetTimer();
     }
 
-    function clearPending(idx) {
-      addXP(30);
-      pendingTasks.splice(idx, 1);
-      localStorage.setItem("pendingTasks", JSON.stringify(pendingTasks));
-      renderPending();
+    function cancelTimer() {
+      clearInterval(timerInterval);
+      AUDIO_BRONCA.play();
+      setMascotState("bravo");
+      document.getElementById("speech").textContent = "Desistiu do bloco? Ajuste a mente e tente novamente!";
+
+      let addedStress = Math.floor(selectedMinutes * 0.5);
+      if (unlockedSkills.includes("shieldStress")) addedStress = Math.floor(addedStress * 0.5);
+      
+      addStress(addedStress);
+      resetTimer();
     }
 
-    // Ranking Dinâmico e Provocações
+    function resetTimer() {
+      document.getElementById("selectTimerDuration").disabled = false;
+      document.getElementById("btnStart").style.display = "block";
+      document.getElementById("btnPause").style.display = "none";
+      document.getElementById("btnFinish").style.display = "none";
+      document.getElementById("btnCancel").style.display = "none";
+      document.getElementById("activeSubjectLabel").textContent = "";
+      timerInterval = null;
+      isPaused = false;
+      currentStudyingSubject = "";
+      timeLeft = selectedMinutes * 60;
+      updateDisplay();
+    }
+
+    function toggleHardcore() {
+      hardcoreMode = !hardcoreMode;
+      const btn = document.getElementById("btnHardcore");
+      if (hardcoreMode) {
+        btn.style.background = "#2ed573";
+        btn.textContent = "🔒 Foco Ativo";
+        alert("Modo Foco Total ativado! Mudar de aba penalizará seu XP!");
+      } else {
+        btn.style.background = "#ff5252";
+        btn.textContent = "🔒 Modo Foco";
+      }
+    }
+
+    window.addEventListener("visibilitychange", () => {
+      if (document.hidden && timerInterval && hardcoreMode) {
+        addStress(15);
+        userXP = Math.max(0, userXP - 20);
+        updateUI();
+        setMascotState("bravo");
+        document.getElementById("speech").textContent = "Você trocou de aba durante o bloco! Penalidade aplicada!";
+      }
+    });
+
+    // Ranking e Rivais
     function renderRanking() {
       const userObj = competitors.find(c => c.isUser);
       userObj.level = userLevel;
       userObj.xp = (userLevel * 100) + userXP;
 
       competitors.sort((a, b) => b.xp - a.xp);
-
-      if (competitors[0].isUser) {
-        alert("👑 INCRÍVEL! Você alcançou o Top 1! Os seus rivais treinaram pesado, subiram de nível e ultrapassaram você!");
-        
-        competitors.forEach(c => {
-          if (!c.isUser) {
-            c.level += Math.floor(Math.random() * 2) + 2;
-            c.xp = userObj.xp + Math.floor(Math.random() * 200) + 150;
-          }
-        });
-
-        competitors.sort((a, b) => b.xp - a.xp);
-      }
-
       localStorage.setItem("competitors", JSON.stringify(competitors));
 
       const rankList = document.getElementById("rankingList");
@@ -1020,15 +1274,13 @@
       const selectIdx = parseInt(document.getElementById("selectRivalToEdit").value);
       const url = document.getElementById("avatarUrlInput").value.trim();
       if (!url) return;
-
       competitors[selectIdx].avatar = url;
       localStorage.setItem("competitors", JSON.stringify(competitors));
       document.getElementById("avatarUrlInput").value = "";
       renderRanking();
-      alert("Foto/Avatar atualizado com sucesso!");
+      alert("Foto/Avatar atualizado!");
     }
 
-    // Sala Virtual
     function renderClassroom() {
       const grid = document.getElementById("classroomGrid");
       grid.innerHTML = "";
@@ -1036,16 +1288,14 @@
         grid.innerHTML += `<div class="desk studying">
           <img src="${comp.avatar}" class="avatar-img" alt="${comp.name}">
           <span>👤 ${comp.name}</span>
-          <small style="color:#2ed573;">Estudando...</small>
+          <small style="color:#2ed573;">Estudando Rufino/Tópicos...</small>
         </div>`;
       });
     }
 
-    // Aba Livros e Capítulos
+    // Capítulos e Livros
     function renderChaptersTab() {
-      let totalDone = 0;
-      let totalCap = 0;
-
+      let totalDone = 0, totalCap = 0;
       const subList = document.getElementById("subjectsChaptersList");
       subList.innerHTML = "";
 
@@ -1068,15 +1318,6 @@
       document.getElementById("totalCapCount").textContent = totalCap;
       document.getElementById("capPercent").textContent = `${percent}%`;
       document.getElementById("capProgressBar").style.width = `${percent}%`;
-
-      const dayIdx = new Date().getDay();
-      const todayList = document.getElementById("todayChaptersList");
-      todayList.innerHTML = "";
-      if (weeklySchedule[dayIdx]) {
-        weeklySchedule[dayIdx].forEach(item => {
-          todayList.innerHTML += `<li>📖 Meta de Cap. para: <strong>${item}</strong></li>`;
-        });
-      }
     }
 
     function changeCap(sub, delta) {
@@ -1087,235 +1328,7 @@
       renderChaptersTab();
     }
 
-    // Cronômetro & Mudanças do Mascote
-    function startTimer() {
-      if (timerInterval) return;
-      
-      setMascotState("estudando");
-      document.getElementById("speech").textContent = "Foco total agora! O seu futuro está sendo construído!";
-
-      document.getElementById("selectTimerDuration").disabled = true;
-      document.getElementById("btnStart").style.display = "none";
-      document.getElementById("btnPause").style.display = "block";
-      document.getElementById("btnFinish").style.display = "block";
-      document.getElementById("btnCancel").style.display = "block";
-
-      timerInterval = setInterval(() => {
-        if (!isPaused) {
-          timeLeft--;
-          updateDisplay();
-          if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            finishTimer();
-          }
-        } else {
-          // Rival avança enquanto você está pausado!
-          competitors[1].xp += 1;
-          renderRanking();
-        }
-      }, 1000);
-    }
-
-    function updateDisplay() {
-      const m = Math.floor(timeLeft / 60);
-      const s = timeLeft % 60;
-      timerEl.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    }
-
-    function pauseTimer() {
-      isPaused = !isPaused;
-      document.getElementById("btnPause").textContent = isPaused ? "Retomar" : "Pausar";
-      if (isPaused) {
-        setMascotState("bravo");
-        document.getElementById("speech").textContent = "Pausou? Cuidado, seus rivais continuam estudando e ganhando XP!";
-      } else {
-        setMascotState("estudando");
-      }
-    }
-
-    function finishTimer() {
-      clearInterval(timerInterval);
-      AUDIO_SUCESSO.play();
-      
-      let gainedXP = Math.floor(selectedMinutes * 2);
-      if (unlockedSkills.includes("boostXp")) gainedXP = Math.floor(gainedXP * 1.2);
-
-      // Aplicação de Debuff se ativo
-      if (activeDebuffBlocks > 0) {
-        gainedXP = Math.floor(gainedXP * 0.8);
-        activeDebuffBlocks--;
-        localStorage.setItem("activeDebuffBlocks", activeDebuffBlocks);
-      }
-
-      addXP(gainedXP);
-      reduceStress(20);
-      damageBoss(100);
-
-      setMascotState("neutro");
-      document.getElementById("speech").textContent = "Excelente trabalho! Bloco concluído com sucesso!";
-
-      alert(`✨ Bloco de ${selectedMinutes} min concluído com sucesso! +${gainedXP} XP!`);
-      resetTimer();
-    }
-
-    function cancelTimer() {
-      clearInterval(timerInterval);
-      AUDIO_BRONCA.play();
-      
-      setMascotState("bravo");
-      document.getElementById("speech").textContent = "Você desistiu do bloco! Mais foco da próxima vez!";
-
-      let addedStress = Math.floor(selectedMinutes * 0.5);
-      if (unlockedSkills.includes("shieldStress")) addedStress = Math.floor(addedStress * 0.5);
-      
-      addStress(addedStress);
-      
-      const dayIdx = new Date().getDay();
-      if (weeklySchedule[dayIdx] && weeklySchedule[dayIdx].length > 0) {
-        pendingTasks.push(weeklySchedule[dayIdx][0]);
-        localStorage.setItem("pendingTasks", JSON.stringify(pendingTasks));
-        renderPending();
-      }
-
-      resetTimer();
-    }
-
-    function resetTimer() {
-      document.getElementById("selectTimerDuration").disabled = false;
-      document.getElementById("btnStart").style.display = "block";
-      document.getElementById("btnPause").style.display = "none";
-      document.getElementById("btnFinish").style.display = "none";
-      document.getElementById("btnCancel").style.display = "none";
-      document.getElementById("activeSubjectLabel").textContent = "";
-      timerInterval = null;
-      isPaused = false;
-      currentStudyingSubject = "";
-      timeLeft = selectedMinutes * 60;
-      updateDisplay();
-    }
-
-    // Modo Hardcore / Perda de Foco por Mudar de Aba
-    function toggleHardcore() {
-      hardcoreMode = !hardcoreMode;
-      const btn = document.getElementById("btnHardcore");
-      if (hardcoreMode) {
-        btn.style.background = "#2ed573";
-        btn.textContent = "🔒 Foco Ativo";
-        alert("Modo Foco Total ativado! Se trocar de aba enquanto o temporizador roda, perderá XP!");
-      } else {
-        btn.style.background = "#ff5252";
-        btn.textContent = "🔒 Modo Foco";
-      }
-    }
-
-    window.addEventListener("visibilitychange", () => {
-      if (document.hidden && timerInterval && hardcoreMode) {
-        addStress(15);
-        userXP = Math.max(0, userXP - 20);
-        updateUI();
-        setMascotState("bravo");
-        document.getElementById("speech").textContent = "Ei! Você saiu da aba enquanto estudava! Penalidade aplicada!";
-      }
-    });
-
-    // SISTEMA DE PUNIÇÕES E TRIBUNAL
-    function applyPunishment() {
-      const sinType = document.getElementById("selectSinType").value;
-      AUDIO_BRONCA.play();
-      setMascotState("bravo");
-
-      let logText = "";
-      if (sinType === "distracao") {
-        userXP = Math.max(0, userXP - 30);
-        addStress(20);
-        logText = "Uso de Celular: -30 XP e +20% Estresse";
-        document.getElementById("speech").textContent = "Distrações custam caro! O seu foco foi quebrado!";
-      } else if (sinType === "procrastinacao") {
-        pendingTasks.push("Revisão de Recuperação Forçada (+5 Questões)");
-        localStorage.setItem("pendingTasks", JSON.stringify(pendingTasks));
-        renderPending();
-        logText = "Procrastinação: Pendência Obrigatoria Adicionada";
-        document.getElementById("speech").textContent = "Deixar para depois só acumula trabalho! Faça a pendência!";
-      } else if (sinType === "desistência") {
-        activeDebuffBlocks = 2;
-        localStorage.setItem("activeDebuffBlocks", activeDebuffBlocks);
-        logText = "Desistência: Debuff Cansaço Mental por 2 blocos (-20% XP)";
-        document.getElementById("speech").textContent = "Desistir gera cansaço mental. Seus próximos blocos renderão menos XP!";
-      }
-
-      punishmentLog.unshift(`${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})} - ${logText}`);
-      localStorage.setItem("punishmentLog", JSON.stringify(punishmentLog));
-      
-      updateUI();
-      renderPunishments();
-      alert(`⚠️ Punição Aplicada: ${logText}`);
-    }
-
-    function renderPunishments() {
-      const list = document.getElementById("punishmentHistory");
-      list.innerHTML = "";
-      if (punishmentLog.length === 0) {
-        list.innerHTML = `<li style="color:#2ed573;">Nenhum pecado de estudo registrado! Continue focado!</li>`;
-      } else {
-        punishmentLog.forEach(item => {
-          list.innerHTML += `<li style="color:#ff5252;">${item}</li>`;
-        });
-      }
-    }
-
-    // Radar Chart & Relatórios
-    function initRadarChart() {
-      const ctx = document.getElementById('radarChart').getContext('2d');
-      radarChartInstance = new Chart(ctx, {
-        type: 'radar',
-        data: {
-          labels: Object.keys(knowledgeStats),
-          datasets: [{
-            label: 'Nível de Domínio (%)',
-            data: Object.values(knowledgeStats),
-            backgroundColor: 'rgba(0, 173, 181, 0.2)',
-            borderColor: '#00adb5',
-            pointBackgroundColor: '#2ed573'
-          }]
-        },
-        options: {
-          scales: { r: { min: 0, max: 100, ticks: { display: false } } }
-        }
-      });
-      updateReportStats();
-    }
-
-    function updateReportStats() {
-      let maxSub = "-", minSub = "-";
-      let maxVal = -1, minVal = 999;
-      for (let s in knowledgeStats) {
-        if (knowledgeStats[s] > maxVal) { maxVal = knowledgeStats[s]; maxSub = s; }
-        if (knowledgeStats[s] < minVal) { minVal = knowledgeStats[s]; minSub = s; }
-      }
-      document.getElementById("reportStats").textContent = `Mais Estudado: ${maxSub} (${maxVal}%) | Precisando de Foco: ${minSub} (${minVal}%)`;
-    }
-
-    function submitQuestions() {
-      const subject = document.getElementById("questMat").value;
-      const count = parseInt(document.getElementById("questCount").value);
-      if (!count || count <= 0) return;
-
-      const gainedXP = count * 5;
-      addXP(gainedXP);
-      damageBoss(count * 10);
-
-      knowledgeStats[subject] = Math.min(knowledgeStats[subject] + Math.ceil(count / 2), 100);
-      localStorage.setItem("knowledgeStats", JSON.stringify(knowledgeStats));
-      
-      radarChartInstance.data.datasets[0].data = Object.values(knowledgeStats);
-      radarChartInstance.update();
-      updateReportStats();
-
-      document.getElementById("questCount").value = "";
-      alert(`🎉 +${gainedXP} XP obtidos por resolver ${count} questões de ${subject}!`);
-    }
-
-    // Batalha de Chefe (Boss Fight)
+    // Boss Fight
     function renderBoss() {
       document.getElementById("bossHpDisplay").textContent = `${bossHp}/1000`;
       document.getElementById("bossHpBar").style.width = `${Math.max(0, (bossHp / 1000) * 100)}%`;
@@ -1327,7 +1340,7 @@
       renderBoss();
       if (bossHp === 0) {
         AUDIO_LEVELUP.play();
-        alert("🐉 PARABÉNS! Você derrotou o Chefe Semanal! Ganhou +300 XP!");
+        alert("🐉 PARABÉNS! Você venceu o Simulado Semanal! +300 XP!");
         addXP(300);
         bossHp = 1000;
         localStorage.setItem("bossHp", bossHp);
@@ -1335,7 +1348,7 @@
       }
     }
 
-    // Árvore de Habilidades (Skills Passivas)
+    // Skills
     const availableSkills = [
       { id: "boostXp", name: "Mente Brilhante", desc: "+20% de XP ao concluir blocos", cost: 200 },
       { id: "shieldStress", name: "Escudo Zen", desc: "Reduz 50% do estresse ao desistir", cost: 150 }
@@ -1347,10 +1360,7 @@
       availableSkills.forEach(s => {
         const isUnlocked = unlockedSkills.includes(s.id);
         container.innerHTML += `<div class="shop-item">
-          <div>
-            <strong>${s.name}</strong><br>
-            <small>${s.desc}</small>
-          </div>
+          <div><strong>${s.name}</strong><br><small>${s.desc}</small></div>
           <button class="buy-btn" ${isUnlocked || userXP < s.cost ? 'disabled' : ''} onclick="buySkill('${s.id}', ${s.cost})">
             ${isUnlocked ? 'Ativo ✓' : `${s.cost} XP`}
           </button>
@@ -1369,7 +1379,7 @@
       }
     }
 
-    // Flashcards & Punição ao errar
+    // Flashcards
     function renderFlashcard() {
       if (flashcards.length === 0) {
         document.getElementById("flashcardText").textContent = "Nenhum flashcard cadastrado!";
@@ -1385,15 +1395,12 @@
     }
 
     function nextCard(success) {
-      if (success) {
-        addXP(10);
-      } else {
-        // Punição por erro no flashcard
+      if (success) addXP(10);
+      else {
         addStress(5);
         userXP = Math.max(0, userXP - 5);
         AUDIO_BRONCA.play();
         setMascotState("bravo");
-        document.getElementById("speech").textContent = "Atenção ao conteúdo! Errar nos Flashcards gera estresse!";
       }
       showingBack = false;
       currentCardIndex = (currentCardIndex + 1) % flashcards.length;
@@ -1408,11 +1415,11 @@
       localStorage.setItem("flashcards", JSON.stringify(flashcards));
       document.getElementById("fcFront").value = "";
       document.getElementById("fcBack").value = "";
-      alert("Flashcard adicionado!");
+      alert("Flashcard Salvo!");
       renderFlashcard();
     }
 
-    // Meta / Calculadora
+    // Metas
     function saveTargetScore() {
       const score = document.getElementById("targetScore").value;
       if (!score) return;
@@ -1423,19 +1430,18 @@
     function updateTargetScoreStatus() {
       const target = localStorage.getItem("targetScore") || 0;
       const currentScoreEst = (userLevel * 50) + Math.floor(userXP / 2);
-      document.getElementById("targetScoreStatus").textContent = `Sua Pontuação RPG Estimada: ${currentScoreEst} / Meta: ${target}`;
+      document.getElementById("targetScoreStatus").textContent = `Sua Pontuação RPG Estimada: ${currentScoreEst} / Meta ITA: ${target}`;
     }
 
     // Loja de 100 Conquistas
     function renderShop() {
       const shopContainer = document.getElementById("shopContainer");
       shopContainer.innerHTML = "";
-      
       for (let i = 1; i <= 100; i++) {
         const cost = i * 80;
         const isUnlocked = unlockedAchievements.includes(i);
         shopContainer.innerHTML += `<div class="shop-item">
-          <span>Conquista #${i} - Marca de Aprendiz ${i}</span>
+          <span>Conquista #${i} - Selo de Exatas ${i}</span>
           <button class="buy-btn" ${isUnlocked || userXP < cost ? 'disabled' : ''} onclick="buyAchievement(${i}, ${cost})">
             ${isUnlocked ? 'Comprado ✓' : `${cost} XP`}
           </button>
@@ -1454,9 +1460,9 @@
       }
     }
 
-    // Hábitos e Saúde
+    // Hábitos
     function addWater(amount) {
-      waterConsumed = Math.min(waterConsumed + amount, 3000);
+      waterConsumed = Math.min(waterConsumed + amount, 3500);
       localStorage.setItem("waterConsumed", waterConsumed);
       document.getElementById("waterCount").textContent = waterConsumed;
     }
@@ -1484,7 +1490,7 @@
       renderWorkouts();
     }
 
-    // Gamificação & Atualização Visual
+    // XP & Estresse
     function addXP(val) {
       userXP += val;
       const xpNeeded = userLevel * 100;
@@ -1492,7 +1498,7 @@
         userXP -= xpNeeded;
         userLevel++;
         AUDIO_LEVELUP.play();
-        alert(`🎉 LEVEL UP! Você alcançou o Nível ${userLevel}!`);
+        alert(`🎉 LEVEL UP! Você subiu para o Nível ${userLevel}!`);
       }
       updateUI();
       renderRanking();
@@ -1529,4 +1535,3 @@
   </script>
 </body>
 </html>
-
