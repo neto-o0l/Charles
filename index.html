@@ -33,7 +33,6 @@
       transition: background-color 0.4s ease;
     }
 
-    /* Tela de Abertura / Splash Screen */
     #splashScreen {
       position: fixed;
       top: 0;
@@ -68,11 +67,8 @@
       100% { opacity: 0; }
     }
 
-    .splash-text.blink {
-      animation: blinkEffect 2.5s ease-in-out forwards;
-    }
+    .splash-text.blink { animation: blinkEffect 2.5s ease-in-out forwards; }
 
-    /* Cores de Fundo Personalizadas */
     body.theme-dark { background-color: #1a1a1d; }
     body.theme-dojo { background-color: #2b1e1e; }
     body.theme-cyber { background-color: #0f1026; }
@@ -289,11 +285,25 @@
       flex-direction: column;
       gap: 6px;
     }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #3e3e4a;
+      padding: 6px 8px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+    }
+    .checklist-item.done {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
   </style>
 </head>
 <body id="bgBody" class="theme-dark">
 
-  <!-- Tela de Abertura / Splash Screen -->
+  <!-- Splash Screen -->
   <div id="splashScreen">
     <div id="splashText" class="splash-text"></div>
   </div>
@@ -306,10 +316,8 @@
       <span class="xp-badge">✨ <span id="xpDisplay">0</span> XP</span>
     </div>
 
-    <!-- Banner de Debuff/Punição Ativa -->
     <div id="debuffBanner" class="debuff-banner">⚠️ DEBUFF: Cansaço Mental (-20% XP)</div>
 
-    <!-- Barra de XP e Estresse -->
     <div class="progress-bar-bg"><div id="xpBar" class="progress-bar-fill"></div></div>
     <div style="display:flex; justify-content: space-between; font-size: 0.75rem; color: #e63946; margin-bottom: 2px;">
       <span>Estresse: <span id="stressDisplay">0%</span></span>
@@ -338,7 +346,7 @@
     <div id="activeSubjectLabel" style="font-size:0.8rem; color:#00adb5; font-weight:bold; height:16px;"></div>
     <div id="timer" class="timer">90:00</div>
 
-    <!-- Controles & Áudio/Hardcore -->
+    <!-- Controles -->
     <div class="buttons" style="margin-bottom: 10px;">
       <button id="btnInstall" class="main-btn install" style="display: none;">📲 Instalar Aplicativo</button>
       <button id="btnStart" class="main-btn" onclick="startTimer()">Iniciar Bloco</button>
@@ -350,30 +358,28 @@
         <button id="btnHardcore" class="main-btn hardcore-btn" style="flex:1; font-size:0.75rem;" onclick="toggleHardcore()">🔒 Modo Foco</button>
       </div>
 
-      <!-- PAINEL EXPANDIDO DE RUÍDOS E LOFI -->
       <div class="audio-panel">
         <div class="custom-row">
-          <label>🎧 Tipo de Som:</label>
+          <label>🎧 Som:</label>
           <select id="selectAudioMode" onchange="changeAudioSource(this.value)">
-            <option value="lofi1">🎵 Lofi Chill Hop 1</option>
-            <option value="lofi2">🎧 Lofi Beats Relax 2</option>
-            <option value="lofi3">🎹 Lofi Piano Chill 3</option>
-            <option value="rain">🌧️ Ruído: Chuva Suave</option>
-            <option value="white">📻 Ruído: Branco (Foco)</option>
-            <option value="pink">🌊 Ruído: Rosa (Ondas)</option>
-            <option value="cafe">☕ Ruído: Cafeteria / Ambiência</option>
+            <option value="lofi1">🎵 Lofi Chill 1</option>
+            <option value="lofi2">🎧 Lofi Beats 2</option>
+            <option value="lofi3">🎹 Lofi Piano 3</option>
+            <option value="rain">🌧️ Chuva Suave</option>
+            <option value="white">📻 Ruído Branco</option>
+            <option value="pink">🌊 Ruído Rosa</option>
+            <option value="cafe">☕ Cafeteria</option>
           </select>
         </div>
         <div class="custom-row">
-          <label>🔊 Volume Som:</label>
+          <label>🔊 Volume:</label>
           <input type="range" id="audioVolume" min="0" max="1" step="0.05" value="0.5" oninput="setAudioVolume(this.value)" style="width: 50%;">
         </div>
       </div>
     </div>
 
-    <!-- Opções de Personalização de Fundo -->
     <div class="custom-row">
-      <label>🎨 Tema do Fundo:</label>
+      <label>🎨 Tema:</label>
       <select id="selectTheme" onchange="changeTheme(this.value)">
         <option value="theme-dark">Escuro Padrão</option>
         <option value="theme-azul-real">Azul Real</option>
@@ -386,13 +392,13 @@
     </div>
   </div>
 
-  <!-- Abas de Navegação -->
+  <!-- Abas -->
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('cronograma')">📅 Cronograma ITA</button>
-    <button class="tab-btn" onclick="switchTab('radar')">🕸️ Teia do Conhecimento</button>
-    <button class="tab-btn" onclick="switchTab('punicoes')">⚖️ Tribunal / Punições</button>
+    <button class="tab-btn" onclick="switchTab('radar')">🕸️ Teia & Checklists</button>
+    <button class="tab-btn" onclick="switchTab('punicoes')">⚖️ Tribunal</button>
     <button class="tab-btn" onclick="switchTab('ranking')">👑 Ranking</button>
-    <button class="tab-btn" onclick="switchTab('boss')">🐉 Chefe Semanal</button>
+    <button class="tab-btn" onclick="switchTab('boss')">🐉 Boss</button>
     <button class="tab-btn" onclick="switchTab('skills')">🌳 Habilidades</button>
     <button class="tab-btn" onclick="switchTab('flashcards')">🎴 Flashcards</button>
     <button class="tab-btn" onclick="switchTab('livros')">📖 Capítulos</button>
@@ -400,13 +406,11 @@
     <button class="tab-btn" onclick="switchTab('loja')">🏆 Loja</button>
     <button class="tab-btn" onclick="switchTab('sala')">🏫 Sala Virtual</button>
     <button class="tab-btn" onclick="switchTab('saude')">💧 Treino & Água</button>
-    <button class="tab-btn" onclick="switchTab('metas')">🎯 Meta ITA</button>
+    <button class="tab-btn" onclick="switchTab('metas')">🎯 Metas</button>
   </div>
 
-  <!-- Card Principal com Conteúdos -->
   <div class="card">
-    
-    <!-- ABA 1: CRONOGRAMA PROGRESSIVO ITA/IME -->
+    <!-- ABA 1: CRONOGRAMA -->
     <div id="tab-cronograma" class="tab-content active">
       <div class="box-section">
         <div class="box-title">⚙️ Seleção da Fase de Progresso:</div>
@@ -435,27 +439,48 @@
       </div>
     </div>
 
-    <!-- ABA RADAR DE CONHECIMENTO (TEIA TODAS AS MATÉRIAS) -->
+    <!-- ABA RADAR + GERENCIADOR DE MATÉRIAS E CHECKLISTS -->
     <div id="tab-radar" class="tab-content">
       <div class="box-section">
         <div class="box-title">🕸️ Teia do Conhecimento Geral:</div>
         <canvas id="radarChart" width="300" height="300"></canvas>
       </div>
+
       <div class="box-section">
-        <div class="box-title">📈 Análise de Domínio Por Matéria:</div>
+        <div class="box-title">➕ Adicionar Nova Matéria:</div>
+        <div class="input-group">
+          <input type="text" id="newSubjectName" placeholder="Ex: Biologia, Geografia, Inglês">
+          <button class="add-btn" onclick="addNewSubject()">Criar</button>
+        </div>
+      </div>
+
+      <div class="box-section">
+        <div class="box-title">📈 Domínio & Gerenciamento de Matérias:</div>
         <div id="subjectBars" style="text-align:left; font-size:0.75rem;"></div>
+      </div>
+
+      <div class="box-section">
+        <div class="box-title">✅ Checklist de Tópicos por Matéria:</div>
+        <div class="input-group" style="margin-bottom: 8px;">
+          <select id="selectSubjectForChecklist" onchange="renderChecklistUI()"></select>
+        </div>
+        <div class="input-group">
+          <input type="text" id="newChecklistItemText" placeholder="Ex: Exercícios de Torricelli / Ler Cap. 3">
+          <button class="add-btn" onclick="addChecklistItem()">Adicionar Tópico</button>
+        </div>
+        <div id="checklistItemsContainer" style="margin-top: 8px;"></div>
       </div>
     </div>
 
-    <!-- ABA: TRIBUNAL E PUNIÇÕES -->
+    <!-- ABA: PUNIÇÕES -->
     <div id="tab-punicoes" class="tab-content">
       <div class="box-section">
         <div class="box-title">⚖️ Registrar "Pecado" de Estudo:</div>
         <div class="input-group">
           <select id="selectSinType">
-            <option value="distracao">Uso de Celular / Distração (Perde XP & Subir Estresse)</option>
-            <option value="procrastinacao">Procrastinação / Atraso (Pendência Forçada)</option>
-            <option value="desistência">Desistiu do Bloco no Meio (Debuff de Cansaço Mental)</option>
+            <option value="distracao">Uso de Celular / Distração</option>
+            <option value="procrastinacao">Procrastinação / Atraso</option>
+            <option value="desistência">Desistiu do Bloco no Meio</option>
           </select>
         </div>
         <button class="add-btn" style="width:100%; background:#e63946;" onclick="applyPunishment()">Confessar & Aplicar Punição</button>
@@ -467,7 +492,7 @@
       </div>
     </div>
 
-    <!-- ABA: RANKING DINÂMICO -->
+    <!-- ABA: RANKING -->
     <div id="tab-ranking" class="tab-content">
       <div class="box-section">
         <div class="box-title">💬 Provocação do Líder:</div>
@@ -498,18 +523,17 @@
       </div>
     </div>
 
-    <!-- ABA: BATALHA DE CHEFE SEMANAL -->
+    <!-- ABA: BOSS -->
     <div id="tab-boss" class="tab-content">
       <div class="box-section">
         <div class="box-title">👾 Simulado Final da Semana:</div>
         <h4 id="bossName" style="color: #ff4757; margin-bottom: 6px;">O Monstro do ITA/IME</h4>
         <p style="font-size:0.75rem;">Vida do Boss: <strong id="bossHpDisplay">1000/1000</strong></p>
         <div class="progress-bar-bg"><div id="bossHpBar" class="progress-bar-fill boss-fill"></div></div>
-        <p style="font-size: 0.7rem; color: #aaa; margin-top: 6px;">* Complete blocos do Rufino, Tópicos de Física e Poliedro para derrotar o chefe!</p>
       </div>
     </div>
 
-    <!-- ABA: ÁRVORE DE HABILIDADES -->
+    <!-- ABA: HABILIDADES -->
     <div id="tab-skills" class="tab-content">
       <div class="box-section">
         <div class="box-title">🌳 Passivas e Atributos:</div>
@@ -522,7 +546,7 @@
       <div class="box-section">
         <div class="box-title">🎴 Revisão Ativa:</div>
         <div class="flashcard" id="flashcardBox" onclick="flipCard()">
-          <span id="flashcardText">Clique para ver uma pergunta/resposta!</span>
+          <span id="flashcardText">Clique para ver a resposta!</span>
         </div>
         <div style="display:flex; gap:6px;">
           <button class="add-btn" style="background:#2ed573; flex:1;" onclick="nextCard(true)">Fácil (+XP)</button>
@@ -531,16 +555,16 @@
       </div>
       <div class="box-section">
         <div class="box-title">➕ Criar Flashcard:</div>
-        <input type="text" id="fcFront" placeholder="Pergunta (Ex: Fórmula de Torricelli)" style="margin-bottom:4px;">
-        <input type="text" id="fcBack" placeholder="Resposta (Ex: v² = v0² + 2aΔs)" style="margin-bottom:4px;">
+        <input type="text" id="fcFront" placeholder="Pergunta" style="margin-bottom:4px;">
+        <input type="text" id="fcBack" placeholder="Resposta" style="margin-bottom:4px;">
         <button class="add-btn" style="width:100%;" onclick="addFlashcard()">Salvar Cartão</button>
       </div>
     </div>
 
-    <!-- ABA: LIVROS & CAPÍTULOS POR MATÉRIA -->
+    <!-- ABA: LIVROS -->
     <div id="tab-livros" class="tab-content">
       <div class="box-section">
-        <div class="box-title">📊 Progresso Geral dos Livros da Base:</div>
+        <div class="box-title">📊 Progresso Geral dos Livros:</div>
         <div style="font-size: 0.75rem; margin-bottom: 4px; display:flex; justify-content:space-between;">
           <span>Concluídos: <strong id="totalCapCompleted">0</strong> / <span id="totalCapCount">188</span></span>
           <span id="capPercent">0%</span>
@@ -554,19 +578,12 @@
       </div>
     </div>
 
-    <!-- ABA: CONVERSOR DE QUESTÕES EN XP -->
+    <!-- ABA: QUESTÕES -->
     <div id="tab-questoes" class="tab-content">
       <div class="box-section">
         <div class="box-title">📝 Registrar Questões Resolvidas:</div>
         <div class="input-group">
-          <select id="questMat">
-            <option value="Matemática">Matemática (Rufino / TQM)</option>
-            <option value="Física">Física (Tópicos de Física)</option>
-            <option value="Química">Química (Poliedro / Brady)</option>
-            <option value="Sociologia">Sociologia (Poliedro)</option>
-            <option value="Português/Redação">Português e Redação</option>
-            <option value="Humanas">Humanas Gerais</option>
-          </select>
+          <select id="questMat"></select>
         </div>
         <div class="input-group">
           <input type="number" id="questCount" placeholder="Qtd. de Questões Feitas">
@@ -575,7 +592,7 @@
       </div>
     </div>
 
-    <!-- ABA: LOJA DE 100 CONQUISTAS -->
+    <!-- ABA: LOJA -->
     <div id="tab-loja" class="tab-content">
       <div class="box-section">
         <div class="box-title">🏆 Loja de Conquistas (Gaste XP):</div>
@@ -583,7 +600,7 @@
       </div>
     </div>
 
-    <!-- ABA: SALA DE AULA VIRTUAL -->
+    <!-- ABA: SALA VIRTUAL -->
     <div id="tab-sala" class="tab-content">
       <div class="box-section">
         <div class="box-title">🏫 Colegas Estudando Agora:</div>
@@ -591,7 +608,7 @@
       </div>
     </div>
 
-    <!-- ABA: SAÚDE E HÁBITOS -->
+    <!-- ABA: SAÚDE -->
     <div id="tab-saude" class="tab-content">
       <div class="box-section">
         <div class="box-title">💧 Hidratação Diária:</div>
@@ -608,11 +625,11 @@
       </div>
     </div>
 
-    <!-- ABA: CALCULADORA DE CORTE -->
+    <!-- ABA: METAS -->
     <div id="tab-metas" class="tab-content">
       <div class="box-section">
         <div class="box-title">🎯 Nota de Corte / Objetivo:</div>
-        <input type="number" id="targetScore" placeholder="Ex: 80 (Meta de Acertos ITA)" style="margin-bottom:6px;">
+        <input type="number" id="targetScore" placeholder="Ex: 80 (Meta ITA)" style="margin-bottom:6px;">
         <button class="add-btn" style="width:100%;" onclick="saveTargetScore()">Salvar Meta</button>
         <p style="margin-top:8px; font-size:0.75rem;" id="targetScoreStatus">Sua Pontuação RPG Estimada: 0</p>
       </div>
@@ -621,7 +638,6 @@
   </div>
 
   <script>
-    // Configuração do Splash Screen
     const splashQuotes = [
       { text: "Olá diamantes brutos com talento", audio: "frase1.mp3" },
       { text: "A ciência é realmente muito elegante", audio: "frase2.mp3" },
@@ -651,13 +667,11 @@
 
     window.addEventListener("DOMContentLoaded", runSplashScreen);
 
-    // Efeitos Sonoros
     const AUDIO_CLICK = new Audio("https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3");
     const AUDIO_LEVELUP = new Audio("https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3");
     const AUDIO_BRONCA = new Audio("https://assets.mixkit.co/active_storage/sfx/2874/2874-preview.mp3");
     const AUDIO_SUCESSO = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
 
-    // Som de Fundo
     const audioSources = {
       lofi1: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
       lofi2: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
@@ -738,7 +752,7 @@
       isSyntheticNoise = false;
     }
 
-    // Estados Globais do Usuário
+    // Estados
     let selectedMinutes = parseInt(localStorage.getItem("selectedMinutes")) || 90;
     let timeLeft = selectedMinutes * 60;
     let timerInterval = null, isPaused = false, currentStudyingSubject = "";
@@ -755,7 +769,7 @@
     let activeDebuffBlocks = parseInt(localStorage.getItem("activeDebuffBlocks")) || 0;
     let activePhase = parseInt(localStorage.getItem("activePhase")) || 1;
 
-    // MATÉRIAS E TEIA DO CONHECIMENTO COMPLETA
+    // MATÉRIAS DINÂMICAS & CHECKLISTS
     let knowledgeStats = JSON.parse(localStorage.getItem("knowledgeStats")) || {
       "Matemática": 10,
       "Física": 10,
@@ -765,10 +779,20 @@
       "Humanas": 10
     };
 
-    // NOVO CRONOGRAMA PROGRESSIVO COMPLETO (FASE 1 A 4)
+    let subjectChecklists = JSON.parse(localStorage.getItem("subjectChecklists")) || {
+      "Matemática": [
+        { text: "Conjuntos Numéricos e Reais", done: false },
+        { text: "Potenciação e Radiciação", done: false }
+      ],
+      "Física": [
+        { text: "Introdução à Cinemática", done: false },
+        { text: "Movimento Uniforme (MU)", done: false }
+      ]
+    };
+
     const fullScheduleData = {
-      1: { // FASE 1 (3h por dia)
-        1: { // Semana 1
+      1: {
+        1: {
           1: ["Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Conjuntos Numéricos e Reais)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 1 (Cinemática e Referencial)"],
           2: ["Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Potenciação e Radiciação)", "Química (1h30): Poliedro Livro 2 – Frente 1 Cap. 4 (Estados da Matéria)"],
           3: ["Física (1h30): Tópicos de Física Vol. 1 – Tópico 1 (Deslocamento e Vel. Média)", "Matemática (1h30): Rufino Vol. 0 – Exercícios Potenciação (Nível 1)"],
@@ -777,7 +801,7 @@
           6: ["Matemática/Física (3h): Revisão semanal e Exercícios (Rufino Cap. 1 / Tópicos 1 e 2)"],
           0: ["Descanso Total 🎉"]
         },
-        2: { // Semana 2
+        2: {
           1: ["Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Produtos Notáveis Complexos e Fatoração)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 2 (Exercícios MU Nível 1 e 2)"],
           2: ["Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Fatoração: Soma e Diferença de Cubos)", "Química (1h30): Poliedro Livro 2 – Frente 2 Cap. 4 (Teoria de Arrhenius e Ácidos)"],
           3: ["Física (1h30): Tópicos de Física Vol. 1 – Tópico 3 (MUV: Aceleração e Equações)", "Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Exercícios Fatoração Militares)"],
@@ -787,7 +811,7 @@
           0: ["Descanso Total 🎉"]
         }
       },
-      2: { // FASE 2 (4.5h por dia)
+      2: {
         3: {
           1: ["Matemática (1h30): Rufino Vol. 0 – Cap. 3 (Equações 1º Grau e Sistemas)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 3 (Queda Livre e Lançamento)", "Química (1h30): Poliedro Livro 2 – Frente 2 Cap. 4 (Bases e Hidróxidos)"],
           2: ["Matemática (1h30): Rufino Vol. 0 – Cap. 3 (Equações 2º Grau e Girard)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 4 (Movimento Circular)", "Sociologia (1h30): Poliedro Sociologia – Cap. 3 (Émile Durkheim)"],
@@ -798,7 +822,7 @@
           0: ["Descanso Total 🎉"]
         }
       },
-      3: { // FASE 3 (6h por dia)
+      3: {
         5: {
           1: ["Matemática (2h): Rufino Vol. 0 – Cap. 4 (Sistema Métrico e Frações)", "Física (2h): Tópicos de Física Vol. 1 – Unid II Tópico 1 (1ª e 2ª Leis de Newton)", "Química (2h): Poliedro Livro 2 – Frente 1 Cap. 5 (Orgânica e Carbono)"],
           2: ["Matemática (2h): Rufino Vol. 0 – Cap. 4 (Razão e Proporção)", "Física (2h): Tópicos de Física Vol. 1 – Unid II Tópico 1 (3ª Lei e Blocos)", "Química (2h): Poliedro Livro 2 – Frente 1 Cap. 5 (Cadeias Carbônicas)"],
@@ -809,7 +833,7 @@
           0: ["Descanso Total 🎉"]
         }
       },
-      4: { // FASE 4 (7h por dia - Alta Performance)
+      4: {
         7: {
           1: ["Bloco 1 (2h): Matemática Teoria + Exercícios (TQM / Álgebra)", "Bloco 2 (2h): Física Teoria + Exercícios Nível 2/3 (Tópicos de Física)", "Bloco 3 (1h30): Química Teoria + Aprofundamento (Poliedro / Brady)", "Bloco 4 (1h30): Questões Militares ITA/IME / Português"],
           2: ["Bloco 1 (2h): Geometria Plana Avançada (Triângulos e Círculos)", "Bloco 2 (2h): Física - Trabalho, Potência e Energia", "Bloco 3 (1h30): Química - Isomeria Plana e Espacial", "Bloco 4 (1h30): Treino Intenso de Questões ITA"],
@@ -863,7 +887,6 @@
 
     const timerEl = document.getElementById("timer");
 
-    // Inicialização da Aplicação
     changeTheme(currentTheme);
     document.getElementById("selectTheme").value = currentTheme;
     document.getElementById("selectTimerDuration").value = selectedMinutes;
@@ -882,6 +905,7 @@
     renderFlashcard();
     renderPunishments();
     initRadarChart();
+    populateSubjectDropdowns();
 
     function changePhase(val) {
       activePhase = parseInt(val);
@@ -962,7 +986,7 @@
         fullScheduleData[activePhase][weekIdx][dayIdx].splice(taskIdx, 1);
         renderScheduleUI();
       }
-      alert("🎉 Bloco Concluído com sucesso! +50 XP adicionados!");
+      alert("🎉 Bloco Concluído! +50 XP!");
     }
 
     function renderPending() {
@@ -987,7 +1011,7 @@
       renderPending();
     }
 
-    // TEIA DE CONHECIMENTO COMPLETA CORRIGIDA
+    // TEIA E GERENCIAMENTO DE MATÉRIAS
     function initRadarChart() {
       const ctx = document.getElementById('radarChart').getContext('2d');
       radarChartInstance = new Chart(ctx, {
@@ -1000,9 +1024,7 @@
             backgroundColor: 'rgba(0, 173, 181, 0.25)',
             borderColor: '#00adb5',
             pointBackgroundColor: '#2ed573',
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: '#00adb5'
+            pointBorderColor: '#fff'
           }]
         },
         options: {
@@ -1022,18 +1044,146 @@
       renderSubjectBars();
     }
 
+    function updateRadarChart() {
+      if (!radarChartInstance) return;
+      radarChartInstance.data.labels = Object.keys(knowledgeStats);
+      radarChartInstance.data.datasets[0].data = Object.values(knowledgeStats);
+      radarChartInstance.update();
+      renderSubjectBars();
+      populateSubjectDropdowns();
+    }
+
+    function addNewSubject() {
+      const input = document.getElementById("newSubjectName");
+      const name = input.value.trim();
+      if (!name) return;
+      if (knowledgeStats.hasOwnProperty(name)) {
+        alert("Esta matéria já existe!");
+        return;
+      }
+
+      knowledgeStats[name] = 10;
+      subjectChecklists[name] = [];
+      localStorage.setItem("knowledgeStats", JSON.stringify(knowledgeStats));
+      localStorage.setItem("subjectChecklists", JSON.stringify(subjectChecklists));
+
+      input.value = "";
+      updateRadarChart();
+      alert(`Matéria "${name}" adicionada com sucesso!`);
+    }
+
+    function removeSubject(subName) {
+      if (Object.keys(knowledgeStats).length <= 3) {
+        alert("Mantenha pelo menos 3 matérias na teia!");
+        return;
+      }
+      if (confirm(`Deseja realmente excluir a matéria "${subName}" e seus checklists?`)) {
+        delete knowledgeStats[subName];
+        delete subjectChecklists[subName];
+        localStorage.setItem("knowledgeStats", JSON.stringify(knowledgeStats));
+        localStorage.setItem("subjectChecklists", JSON.stringify(subjectChecklists));
+        updateRadarChart();
+      }
+    }
+
     function renderSubjectBars() {
       const container = document.getElementById("subjectBars");
       container.innerHTML = "";
       for (let sub in knowledgeStats) {
         const val = knowledgeStats[sub];
-        container.innerHTML += `<div style="margin-bottom:6px;">
-          <div style="display:flex; justify-space-between; margin-bottom:2px;">
-            <span>${sub}</span>
-            <strong>${val}%</strong>
+        container.innerHTML += `<div style="margin-bottom:8px; background:#222226; padding:6px; border-radius:6px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span><strong>${sub}</strong></span>
+            <div>
+              <button class="add-btn" style="padding:2px 6px; font-size:0.7rem;" onclick="changeSubjectVal('${sub}', 5)">+5%</button>
+              <button class="add-btn" style="padding:2px 6px; font-size:0.7rem; background:#f39c12;" onclick="changeSubjectVal('${sub}', -5)">-5%</button>
+              <button class="add-btn" style="padding:2px 6px; font-size:0.7rem; background:#e63946;" onclick="removeSubject('${sub}')">🗑️</button>
+            </div>
           </div>
           <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${val}%;"></div></div>
+          <span style="font-size:0.7rem; color:#aaa;">Nível de Domínio: ${val}%</span>
         </div>`;
+      }
+    }
+
+    function changeSubjectVal(sub, delta) {
+      knowledgeStats[sub] = Math.max(0, Math.min(100, knowledgeStats[sub] + delta));
+      localStorage.setItem("knowledgeStats", JSON.stringify(knowledgeStats));
+      updateRadarChart();
+    }
+
+    function populateSubjectDropdowns() {
+      const selChecklist = document.getElementById("selectSubjectForChecklist");
+      const selQuest = document.getElementById("questMat");
+
+      selChecklist.innerHTML = "";
+      selQuest.innerHTML = "";
+
+      for (let sub in knowledgeStats) {
+        selChecklist.innerHTML += `<option value="${sub}">${sub}</option>`;
+        selQuest.innerHTML += `<option value="${sub}">${sub}</option>`;
+      }
+
+      renderChecklistUI();
+    }
+
+    // CHECKLIST POR MATÉRIA
+    function renderChecklistUI() {
+      const sub = document.getElementById("selectSubjectForChecklist").value;
+      const container = document.getElementById("checklistItemsContainer");
+      container.innerHTML = "";
+
+      if (!sub || !subjectChecklists[sub]) {
+        container.innerHTML = `<p style="font-size:0.75rem; color:#aaa;">Selecione ou crie uma matéria.</p>`;
+        return;
+      }
+
+      const items = subjectChecklists[sub];
+      if (items.length === 0) {
+        container.innerHTML = `<p style="font-size:0.75rem; color:#aaa;">Nenhum tópico no checklist desta matéria.</p>`;
+        return;
+      }
+
+      items.forEach((item, idx) => {
+        container.innerHTML += `<div class="checklist-item ${item.done ? 'done' : ''}">
+          <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleChecklistItem('${sub}', ${idx})">
+          <span style="flex:1; font-size:0.75rem; text-align:left;">${item.text}</span>
+          <button class="add-btn" style="background:#e63946; padding:2px 6px; font-size:0.65rem;" onclick="removeChecklistItem('${sub}', ${idx})">✕</button>
+        </div>`;
+      });
+    }
+
+    function addChecklistItem() {
+      const sub = document.getElementById("selectSubjectForChecklist").value;
+      const input = document.getElementById("newChecklistItemText");
+      const text = input.value.trim();
+      if (!sub || !text) return;
+
+      if (!subjectChecklists[sub]) subjectChecklists[sub] = [];
+      subjectChecklists[sub].push({ text: text, done: false });
+      localStorage.setItem("subjectChecklists", JSON.stringify(subjectChecklists));
+
+      input.value = "";
+      renderChecklistUI();
+    }
+
+    function toggleChecklistItem(sub, idx) {
+      if (subjectChecklists[sub] && subjectChecklists[sub][idx]) {
+        subjectChecklists[sub][idx].done = !subjectChecklists[sub][idx].done;
+        if (subjectChecklists[sub][idx].done) {
+          addXP(15);
+          AUDIO_SUCESSO.play();
+        }
+        localStorage.setItem("subjectChecklists", JSON.stringify(subjectChecklists));
+        renderChecklistUI();
+      }
+    }
+
+    function removeChecklistItem(sub, idx) {
+      if (subjectChecklists[sub]) {
+        subjectChecklists[sub].splice(idx, 1);
+        localStorage.setItem("subjectChecklists", JSON.stringify(subjectChecklists));
+        renderChecklistUI();
       }
     }
 
@@ -1046,19 +1196,17 @@
       addXP(gainedXP);
       damageBoss(count * 10);
 
-      const targetKey = knowledgeStats.hasOwnProperty(subject) ? subject : "Matemática";
-      knowledgeStats[targetKey] = Math.min(knowledgeStats[targetKey] + Math.ceil(count / 2), 100);
-      localStorage.setItem("knowledgeStats", JSON.stringify(knowledgeStats));
-      
-      radarChartInstance.data.datasets[0].data = Object.values(knowledgeStats);
-      radarChartInstance.update();
-      renderSubjectBars();
+      if (knowledgeStats.hasOwnProperty(subject)) {
+        knowledgeStats[subject] = Math.min(knowledgeStats[subject] + Math.ceil(count / 2), 100);
+        localStorage.setItem("knowledgeStats", JSON.stringify(knowledgeStats));
+        updateRadarChart();
+      }
 
       document.getElementById("questCount").value = "";
       alert(`🎉 +${gainedXP} XP obtidos por resolver ${count} questões de ${subject}!`);
     }
 
-    // Punições e Tribunal
+    // Tribunal
     function applyPunishment() {
       const sinType = document.getElementById("selectSinType").value;
       AUDIO_BRONCA.play();
@@ -1069,18 +1217,18 @@
         userXP = Math.max(0, userXP - 30);
         addStress(20);
         logText = "Distração/Celular: -30 XP e +20% Estresse";
-        document.getElementById("speech").textContent = "Foco total! O ITA não tolera distrações com redes sociais!";
+        document.getElementById("speech").textContent = "Foco total! O ITA não tolera distrações!";
       } else if (sinType === "procrastinacao") {
-        pendingTasks.push("Bloco Extra de Recuperação (Rufino/Tópicos)");
+        pendingTasks.push("Bloco Extra de Recuperação");
         localStorage.setItem("pendingTasks", JSON.stringify(pendingTasks));
         renderPending();
         logText = "Procrastinação: Bloco Extra Pendente";
-        document.getElementById("speech").textContent = "Procrastinar acumula matéria. Recupere o tempo perdido!";
+        document.getElementById("speech").textContent = "Procrastinar acumula matéria!";
       } else if (sinType === "desistência") {
         activeDebuffBlocks = 2;
         localStorage.setItem("activeDebuffBlocks", activeDebuffBlocks);
         logText = "Desistência: Debuff Cansaço Mental (-20% XP por 2 blocos)";
-        document.getElementById("speech").textContent = "Você desistiu no meio do bloco! Debuff ativado!";
+        document.getElementById("speech").textContent = "Você desistiu no meio do bloco!";
       }
 
       punishmentLog.unshift(`${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})} - ${logText}`);
@@ -1095,7 +1243,7 @@
       const list = document.getElementById("punishmentHistory");
       list.innerHTML = "";
       if (punishmentLog.length === 0) {
-        list.innerHTML = `<li style="color:#2ed573;">Nenhum pecado de estudo registrado! Perfeito!</li>`;
+        list.innerHTML = `<li style="color:#2ed573;">Nenhuma penalidade! Perfeito!</li>`;
       } else {
         punishmentLog.forEach(item => {
           list.innerHTML += `<li style="color:#ff5252;">${item}</li>`;
@@ -1103,7 +1251,7 @@
       }
     }
 
-    // Funções do Temporizador
+    // Timer
     function changeTimerDuration(val) {
       if (timerInterval) return;
       selectedMinutes = parseInt(val);
@@ -1166,7 +1314,7 @@
       document.getElementById("btnPause").textContent = isPaused ? "Retomar" : "Pausar";
       if (isPaused) {
         setMascotState("bravo");
-        document.getElementById("speech").textContent = "Pausou? Seus concorrentes do ITA continuam estudando!";
+        document.getElementById("speech").textContent = "Pausou? Seus concorrentes continuam estudando!";
       } else {
         setMascotState("estudando");
       }
@@ -1189,7 +1337,7 @@
       damageBoss(100);
 
       setMascotState("neutro");
-      document.getElementById("speech").textContent = "Excelente! Mais um bloco rumo à aprovação concluído!";
+      document.getElementById("speech").textContent = "Excelente! Bloco concluído com sucesso!";
       alert(`✨ Bloco de ${selectedMinutes} min concluído! +${gainedXP} XP!`);
       resetTimer();
     }
@@ -1198,7 +1346,7 @@
       clearInterval(timerInterval);
       AUDIO_BRONCA.play();
       setMascotState("bravo");
-      document.getElementById("speech").textContent = "Desistiu do bloco? Ajuste a mente e tente novamente!";
+      document.getElementById("speech").textContent = "Desistiu do bloco? Reajuste e volte forte!";
 
       let addedStress = Math.floor(selectedMinutes * 0.5);
       if (unlockedSkills.includes("shieldStress")) addedStress = Math.floor(addedStress * 0.5);
@@ -1244,7 +1392,7 @@
       }
     });
 
-    // Ranking e Rivais
+    // Ranking
     function renderRanking() {
       const userObj = competitors.find(c => c.isUser);
       userObj.level = userLevel;
@@ -1278,7 +1426,7 @@
       localStorage.setItem("competitors", JSON.stringify(competitors));
       document.getElementById("avatarUrlInput").value = "";
       renderRanking();
-      alert("Foto/Avatar atualizado!");
+      alert("Avatar atualizado!");
     }
 
     function renderClassroom() {
@@ -1293,7 +1441,7 @@
       });
     }
 
-    // Capítulos e Livros
+    // Capítulos
     function renderChaptersTab() {
       let totalDone = 0, totalCap = 0;
       const subList = document.getElementById("subjectsChaptersList");
@@ -1328,7 +1476,7 @@
       renderChaptersTab();
     }
 
-    // Boss Fight
+    // Boss
     function renderBoss() {
       document.getElementById("bossHpDisplay").textContent = `${bossHp}/1000`;
       document.getElementById("bossHpBar").style.width = `${Math.max(0, (bossHp / 1000) * 100)}%`;
@@ -1340,7 +1488,7 @@
       renderBoss();
       if (bossHp === 0) {
         AUDIO_LEVELUP.play();
-        alert("🐉 PARABÉNS! Você venceu o Simulado Semanal! +300 XP!");
+        alert("🐉 PARABÉNS! Você venceu o Boss Semanal! +300 XP!");
         addXP(300);
         bossHp = 1000;
         localStorage.setItem("bossHp", bossHp);
@@ -1350,8 +1498,8 @@
 
     // Skills
     const availableSkills = [
-      { id: "boostXp", name: "Mente Brilhante", desc: "+20% de XP ao concluir blocos", cost: 200 },
-      { id: "shieldStress", name: "Escudo Zen", desc: "Reduz 50% do estresse ao desistir", cost: 150 }
+      { id: "boostXp", name: "Mente Brilhante", desc: "+20% de XP em blocos", cost: 200 },
+      { id: "shieldStress", name: "Escudo Zen", desc: "-50% de estresse ao desistir", cost: 150 }
     ];
 
     function renderSkills() {
@@ -1382,7 +1530,7 @@
     // Flashcards
     function renderFlashcard() {
       if (flashcards.length === 0) {
-        document.getElementById("flashcardText").textContent = "Nenhum flashcard cadastrado!";
+        document.getElementById("flashcardText").textContent = "Nenhum flashcard!";
         return;
       }
       const card = flashcards[currentCardIndex];
@@ -1433,7 +1581,7 @@
       document.getElementById("targetScoreStatus").textContent = `Sua Pontuação RPG Estimada: ${currentScoreEst} / Meta ITA: ${target}`;
     }
 
-    // Loja de 100 Conquistas
+    // Loja
     function renderShop() {
       const shopContainer = document.getElementById("shopContainer");
       shopContainer.innerHTML = "";
@@ -1490,7 +1638,7 @@
       renderWorkouts();
     }
 
-    // XP & Estresse
+    // XP
     function addXP(val) {
       userXP += val;
       const xpNeeded = userLevel * 100;
@@ -1535,3 +1683,6 @@
   </script>
 </body>
 </html>
+
+
+          
