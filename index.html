@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -299,6 +300,33 @@
       text-decoration: line-through;
       opacity: 0.6;
     }
+
+    /* Tabela de Planilha de Cronograma */
+    .schedule-table-container {
+      overflow-x: auto;
+      max-height: 280px;
+      border-radius: 8px;
+    }
+    .schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.7rem;
+      text-align: center;
+    }
+    .schedule-table th, .schedule-table td {
+      border: 1px solid #3e3e4a;
+      padding: 6px 4px;
+    }
+    .schedule-table th {
+      background: #00adb5;
+      color: #fff;
+      position: sticky;
+      top: 0;
+    }
+    .schedule-table td {
+      background: #2d2d34;
+      word-break: break-word;
+    }
   </style>
 </head>
 <body id="bgBody" class="theme-dark">
@@ -394,7 +422,7 @@
 
   <!-- Abas -->
   <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('cronograma')">📅 Cronograma ITA</button>
+    <button class="tab-btn active" onclick="switchTab('cronograma')">📅 Cronograma Personalizável</button>
     <button class="tab-btn" onclick="switchTab('radar')">🕸️ Teia & Checklists</button>
     <button class="tab-btn" onclick="switchTab('punicoes')">⚖️ Tribunal</button>
     <button class="tab-btn" onclick="switchTab('ranking')">👑 Ranking</button>
@@ -410,29 +438,64 @@
   </div>
 
   <div class="card">
-    <!-- ABA 1: CRONOGRAMA -->
+    <!-- ABA 1: CRONOGRAMA PERSONALIZÁVEL -->
     <div id="tab-cronograma" class="tab-content active">
+      <!-- Gerenciador de Blocos Personalizados -->
       <div class="box-section">
-        <div class="box-title">⚙️ Seleção da Fase de Progresso:</div>
-        <select id="selectPhase" onchange="changePhase(this.value)" style="margin-bottom:8px;">
-          <option value="1">FASE 1: Construção de Base (3h/dia - Sem. 1 e 2)</option>
-          <option value="2">FASE 2: Consolidação (4,5h/dia - Sem. 3 e 4)</option>
-          <option value="3">FASE 3: Aprofundamento (6h/dia - Sem. 5 e 6)</option>
-          <option value="4">FASE 4: Performance Máxima (7h/dia - Sem. 7+)</option>
-        </select>
-        
-        <div id="weekSubSelector" style="display:none; margin-bottom:6px;">
-          <select id="selectWeek" onchange="renderScheduleUI()">
-            <option value="1">Semana 1</option>
-            <option value="2">Semana 2</option>
+        <div class="box-title">➕ Criar / Editar Bloco de Estudo:</div>
+        <div class="input-group">
+          <select id="customDaySelect">
+            <option value="1">Segunda-feira</option>
+            <option value="2">Terça-feira</option>
+            <option value="3">Quarta-feira</option>
+            <option value="4">Quinta-feira</option>
+            <option value="5">Sexta-feira</option>
+            <option value="6">Sábado</option>
+            <option value="0">Domingo</option>
           </select>
+          <input type="time" id="customTimeInput" value="08:00">
+        </div>
+        <div class="input-group">
+          <input type="text" id="customSubjectInput" placeholder="Matéria/Descrição Ex: Matemática - Rufino Cap.1">
+          <button class="add-btn" onclick="addOrUpdateCustomBlock()">Salvar</button>
         </div>
       </div>
 
+      <!-- Filtro por dia -->
       <div class="box-section">
         <div class="box-title">📅 Blocos de Hoje (<span id="currentDayName"></span>):</div>
+        <div class="input-group" style="margin-bottom:8px;">
+          <select id="filterDaySelect" onchange="renderScheduleUI()">
+            <option value="today">Dia Atual Hoje</option>
+            <option value="1">Segunda-feira</option>
+            <option value="2">Terça-feira</option>
+            <option value="3">Quarta-feira</option>
+            <option value="4">Quinta-feira</option>
+            <option value="5">Sexta-feira</option>
+            <option value="6">Sábado</option>
+            <option value="0">Domingo</option>
+          </select>
+        </div>
         <ul id="scheduleList" class="item-list"></ul>
       </div>
+
+      <!-- Planilha de Cronograma Interativa -->
+      <div class="box-section">
+        <div class="box-title">📊 Planilha Visão Semanal:</div>
+        <div class="schedule-table-container">
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th>Dia</th>
+                <th>Horário</th>
+                <th>Matéria / Atividade</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
       <div class="box-section">
         <div class="box-title">⚠️ Pendências do Plano:</div>
         <ul id="pendingList" class="item-list"></ul>
@@ -767,7 +830,20 @@
     let bossHp = parseInt(localStorage.getItem("bossHp")) || 1000;
     let hardcoreMode = false;
     let activeDebuffBlocks = parseInt(localStorage.getItem("activeDebuffBlocks")) || 0;
-    let activePhase = parseInt(localStorage.getItem("activePhase")) || 1;
+
+    // CRONOGRAMA DINÂMICO & ED TÁVEL (Dias: 0=Dom, 1=Seg, ..., 6=Sáb)
+    const defaultSchedule = {
+      1: [{ time: "08:00", text: "Matemática: Rufino Vol.0 Cap. 1" }, { time: "10:00", text: "Física: Cinemática Tópico 1" }],
+      2: [{ time: "08:00", text: "Matemática: Potenciação" }, { time: "10:00", text: "Química: Estados da Matéria" }],
+      3: [{ time: "08:00", text: "Física: Velocidade Média" }, { time: "10:00", text: "Matemática: Exercícios Rufino" }],
+      4: [{ time: "08:00", text: "Química: Forças Intermoleculares" }, { time: "10:00", text: "Sociologia: Olhar Sociológico" }],
+      5: [{ time: "08:00", text: "Matemática: Produtos Notáveis" }, { time: "10:00", text: "Física: Movimento Uniforme" }],
+      6: [{ time: "09:00", text: "Revisão Semanal e Exercícios Bloco ITA" }],
+      0: [{ time: "10:00", text: "Descanso Ativo / Leitura 🎉" }]
+    };
+
+    let userSchedule = JSON.parse(localStorage.getItem("userSchedule")) || defaultSchedule;
+    let editingBlockKey = null; // { day, index }
 
     // MATÉRIAS DINÂMICAS & CHECKLISTS
     let knowledgeStats = JSON.parse(localStorage.getItem("knowledgeStats")) || {
@@ -788,62 +864,6 @@
         { text: "Introdução à Cinemática", done: false },
         { text: "Movimento Uniforme (MU)", done: false }
       ]
-    };
-
-    const fullScheduleData = {
-      1: {
-        1: {
-          1: ["Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Conjuntos Numéricos e Reais)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 1 (Cinemática e Referencial)"],
-          2: ["Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Potenciação e Radiciação)", "Química (1h30): Poliedro Livro 2 – Frente 1 Cap. 4 (Estados da Matéria)"],
-          3: ["Física (1h30): Tópicos de Física Vol. 1 – Tópico 1 (Deslocamento e Vel. Média)", "Matemática (1h30): Rufino Vol. 0 – Exercícios Potenciação (Nível 1)"],
-          4: ["Química (1h30): Poliedro Livro 2 – Frente 1 Cap. 4 (Forças Intermoleculares)", "Sociologia (1h30): Poliedro Sociologia – Cap. 1 (Olhar Sociológico)"],
-          5: ["Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Operações Algébricas e Produtos Notáveis)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 2 (Movimento Uniforme)"],
-          6: ["Matemática/Física (3h): Revisão semanal e Exercícios (Rufino Cap. 1 / Tópicos 1 e 2)"],
-          0: ["Descanso Total 🎉"]
-        },
-        2: {
-          1: ["Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Produtos Notáveis Complexos e Fatoração)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 2 (Exercícios MU Nível 1 e 2)"],
-          2: ["Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Fatoração: Soma e Diferença de Cubos)", "Química (1h30): Poliedro Livro 2 – Frente 2 Cap. 4 (Teoria de Arrhenius e Ácidos)"],
-          3: ["Física (1h30): Tópicos de Física Vol. 1 – Tópico 3 (MUV: Aceleração e Equações)", "Matemática (1h30): Rufino Vol. 0 – Cap. 1 (Exercícios Fatoração Militares)"],
-          4: ["Química (1h30): Poliedro Livro 2 – Frente 2 Cap. 4 (Nomenclatura dos Ácidos)", "Sociologia (1h30): Poliedro Sociologia – Cap. 2 (Origens e Rev. Industrial)"],
-          5: ["Matemática (1h30): Rufino Vol. 0 – Cap. 2 (M.D.C e M.M.C de Polinômios)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 3 (Torricelli e Gráficos MUV)"],
-          6: ["Revisão Ativa (3h): Exercícios Tópicos de Física (Nível 2) e Rufino"],
-          0: ["Descanso Total 🎉"]
-        }
-      },
-      2: {
-        3: {
-          1: ["Matemática (1h30): Rufino Vol. 0 – Cap. 3 (Equações 1º Grau e Sistemas)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 3 (Queda Livre e Lançamento)", "Química (1h30): Poliedro Livro 2 – Frente 2 Cap. 4 (Bases e Hidróxidos)"],
-          2: ["Matemática (1h30): Rufino Vol. 0 – Cap. 3 (Equações 2º Grau e Girard)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 4 (Movimento Circular)", "Sociologia (1h30): Poliedro Sociologia – Cap. 3 (Émile Durkheim)"],
-          3: ["Matemática (1h30): Rufino Vol. 0 – Cap. 3 (Inequações 1º e 2º Grau)", "Química (1h30): Poliedro Livro 2 – Frente 2 Cap. 5 (Sais e Neutralização)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 4 (Engrenagens e Polias)"],
-          4: ["Matemática (1h30): Tópicos de Álgebra Elementar (Produtos e Inequações)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 5 (Vetores e Decomposição)", "Química (1h30): Poliedro Livro 2 – Frente 2 Cap. 5 (Óxidos)"],
-          5: ["Matemática (1h30): TQM Ensino Médio (Exercícios de Fixação)", "Física (1h30): Tópicos de Física Vol. 1 – Tópico 5 (Cinemática Vetorial)", "Revisão/Redação (1h30): Leitura e Estrutura Redação Militar"],
-          6: ["Bloco Intensivo Exercícios (4h30): Tópicos de Física (Nível 2 e 3) e Rufino Cap. 1-3"],
-          0: ["Descanso Total 🎉"]
-        }
-      },
-      3: {
-        5: {
-          1: ["Matemática (2h): Rufino Vol. 0 – Cap. 4 (Sistema Métrico e Frações)", "Física (2h): Tópicos de Física Vol. 1 – Unid II Tópico 1 (1ª e 2ª Leis de Newton)", "Química (2h): Poliedro Livro 2 – Frente 1 Cap. 5 (Orgânica e Carbono)"],
-          2: ["Matemática (2h): Rufino Vol. 0 – Cap. 4 (Razão e Proporção)", "Física (2h): Tópicos de Física Vol. 1 – Unid II Tópico 1 (3ª Lei e Blocos)", "Química (2h): Poliedro Livro 2 – Frente 1 Cap. 5 (Cadeias Carbônicas)"],
-          3: ["Matemática (2h): TQM Ensino Médio – Fatoração e Inequações (CN/EPCAR/ITA)", "Física (2h): Tópicos de Física Vol. 1 – Unid II Tópico 2 (Atrito Estático/Cinético)", "Química (2h): Poliedro Livro 2 – Frente 1 Cap. 6 (Nomenclatura Hidrocarbonetos)"],
-          4: ["Matemática (2h): TQM Ensino Médio – Funções (Conceito, Domínio, Imagem)", "Física (2h): Tópicos de Física Vol. 1 – Unid II Tópico 3 (Centrípeta e Curvas)", "Sociologia/Humanas (2h): Poliedro Sociologia – Cap. 4 e 5 (Weber e Marx)"],
-          5: ["Matemática (2h): TQM Ensino Médio – Funções Injetoras, Bijetoras e Inversas", "Física (2h): Tópicos de Física Vol. 1 – Unid II Tópico 4 (Gravitação Universal)", "Química (2h): Poliedro Livro 2 – Frente 1 Cap. 6 (Funções Oxigenadas)"],
-          6: ["Resolução ITA/IME (4h): Lista Leis de Newton, Atrito e TQM", "Análise Gabaritos RES1 (2h): Consulta de Resoluções Detalhadas"],
-          0: ["Descanso Total 🎉"]
-        }
-      },
-      4: {
-        7: {
-          1: ["Bloco 1 (2h): Matemática Teoria + Exercícios (TQM / Álgebra)", "Bloco 2 (2h): Física Teoria + Exercícios Nível 2/3 (Tópicos de Física)", "Bloco 3 (1h30): Química Teoria + Aprofundamento (Poliedro / Brady)", "Bloco 4 (1h30): Questões Militares ITA/IME / Português"],
-          2: ["Bloco 1 (2h): Geometria Plana Avançada (Triângulos e Círculos)", "Bloco 2 (2h): Física - Trabalho, Potência e Energia", "Bloco 3 (1h30): Química - Isomeria Plana e Espacial", "Bloco 4 (1h30): Treino Intenso de Questões ITA"],
-          3: ["Bloco 1 (2h): Trigonometria Avançada e Equações", "Bloco 2 (2h): Física - Impulso e Colisões", "Bloco 3 (1h30): Química - Soluções e Concentrações", "Bloco 4 (1h30): Redação Militar e Humanas"],
-          4: ["Bloco 1 (2h): Análise Combinatória e Binômio de Newton", "Bloco 2 (2h): Física Vol. 2 - Termometria e Calorimetria", "Bloco 3 (1h30): Físico-Química - Termodinâmica Química", "Bloco 4 (1h30): Provas Anteriores ITA/IME"],
-          5: ["Bloco 1 (2h): Probabilidade e Matrizes Avançadas", "Bloco 2 (2h): Física - Gases Perfeitos e Termodinâmica", "Bloco 3 (1h30): Química Orgânica Aprofundada", "Bloco 4 (1h30): Simulado de Velocidade"],
-          6: ["Simulado Completo ITA/IME (5h)", "Análise de Erros e RES PDFs (2h)"],
-          0: ["Descanso Ativo e Recuperação Mental 🎉"]
-        }
-      }
     };
 
     let competitors = JSON.parse(localStorage.getItem("competitors")) || [
@@ -890,10 +910,10 @@
     changeTheme(currentTheme);
     document.getElementById("selectTheme").value = currentTheme;
     document.getElementById("selectTimerDuration").value = selectedMinutes;
-    document.getElementById("selectPhase").value = activePhase;
 
     updateDisplay();
-    changePhase(activePhase);
+    renderScheduleUI();
+    renderScheduleTable();
     updateUI();
     renderRanking();
     renderClassroom();
@@ -907,55 +927,85 @@
     initRadarChart();
     populateSubjectDropdowns();
 
-    function changePhase(val) {
-      activePhase = parseInt(val);
-      localStorage.setItem("activePhase", activePhase);
-      const sub = document.getElementById("weekSubSelector");
-      const selWeek = document.getElementById("selectWeek");
+    // LÓGICA DO CRONOGRAMA DINÂMICO
+    const daysMap = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
 
-      if (activePhase === 1) {
-        sub.style.display = "block";
-        selWeek.innerHTML = `<option value="1">Semana 1</option><option value="2">Semana 2</option>`;
-      } else if (activePhase === 2) {
-        sub.style.display = "block";
-        selWeek.innerHTML = `<option value="3">Semana 3</option><option value="4">Semana 4</option>`;
-      } else if (activePhase === 3) {
-        sub.style.display = "block";
-        selWeek.innerHTML = `<option value="5">Semana 5</option><option value="6">Semana 6</option>`;
-      } else {
-        sub.style.display = "none";
+    function addOrUpdateCustomBlock() {
+      const day = document.getElementById("customDaySelect").value;
+      const time = document.getElementById("customTimeInput").value || "08:00";
+      const text = document.getElementById("customSubjectInput").value.trim();
+
+      if (!text) {
+        alert("Digite o nome ou descrição da matéria!");
+        return;
       }
 
+      if (!userSchedule[day]) userSchedule[day] = [];
+
+      if (editingBlockKey !== null) {
+        // Atualiza item existente
+        userSchedule[editingBlockKey.day][editingBlockKey.index] = { time, text };
+        editingBlockKey = null;
+      } else {
+        // Cria novo
+        userSchedule[day].push({ time, text });
+      }
+
+      // Ordenar blocos por horário
+      userSchedule[day].sort((a, b) => a.time.localeCompare(b.time));
+
+      localStorage.setItem("userSchedule", JSON.stringify(userSchedule));
+      document.getElementById("customSubjectInput").value = "";
+      
       renderScheduleUI();
+      renderScheduleTable();
+      alert("Bloco de estudo salvo com sucesso!");
+    }
+
+    function editScheduleTask(day, idx) {
+      const item = userSchedule[day][idx];
+      document.getElementById("customDaySelect").value = day;
+      document.getElementById("customTimeInput").value = item.time;
+      document.getElementById("customSubjectInput").value = item.text;
+      editingBlockKey = { day, index: idx };
+      document.getElementById("customSubjectInput").focus();
+    }
+
+    function removeScheduleTask(day, idx) {
+      if (confirm("Deseja realmente remover este bloco?")) {
+        userSchedule[day].splice(idx, 1);
+        localStorage.setItem("userSchedule", JSON.stringify(userSchedule));
+        renderScheduleUI();
+        renderScheduleTable();
+      }
     }
 
     function renderScheduleUI() {
-      const dayIdx = new Date().getDay();
-      const daysNames = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-      document.getElementById("currentDayName").textContent = daysNames[dayIdx];
+      const todayIdx = new Date().getDay();
+      document.getElementById("currentDayName").textContent = daysMap[todayIdx];
 
-      let weekIdx = 1;
-      if (activePhase === 1) weekIdx = document.getElementById("selectWeek").value || 1;
-      else if (activePhase === 2) weekIdx = 3;
-      else if (activePhase === 3) weekIdx = 5;
-      else weekIdx = 7;
+      const filterVal = document.getElementById("filterDaySelect").value;
+      const selectedDayIdx = filterVal === "today" ? todayIdx : parseInt(filterVal);
 
       const list = document.getElementById("scheduleList");
       list.innerHTML = "";
 
-      const phaseObj = fullScheduleData[activePhase];
-      const weekObj = phaseObj ? phaseObj[weekIdx] : null;
-      const todayTasks = weekObj ? weekObj[dayIdx] : null;
+      const todayTasks = userSchedule[selectedDayIdx] || [];
 
-      if (!todayTasks || todayTasks.length === 0) {
-        list.innerHTML = `<li style="color:#2ed573;">Descanso ou Blocos Concluídos! 🎉</li>`;
+      if (todayTasks.length === 0) {
+        list.innerHTML = `<li style="color:#aaa;">Nenhum bloco cadastrado para este dia.</li>`;
       } else {
         todayTasks.forEach((item, index) => {
           list.innerHTML += `<li>
-            <span style="font-size:0.75rem;">${item}</span>
+            <div style="text-align:left;">
+              <strong style="color:#00adb5;">[${item.time}]</strong> 
+              <span style="font-size:0.75rem;">${item.text}</span>
+            </div>
             <div style="display:flex; gap:4px;">
-              <button class="add-btn" style="background:#2ed573; padding:4px 6px;" onclick="startScheduleTask('${item}')">⏱️</button>
-              <button class="add-btn" style="padding:4px 6px;" onclick="completeScheduleTask(${index})">✓ (+50 XP)</button>
+              <button class="add-btn" style="background:#2ed573; padding:4px 6px;" onclick="startScheduleTask('${item.text}')">⏱️</button>
+              <button class="add-btn" style="padding:4px 6px;" onclick="completeScheduleTask(${selectedDayIdx}, ${index})">✓ (+50 XP)</button>
+              <button class="add-btn" style="background:#f39c12; padding:4px 6px;" onclick="editScheduleTask(${selectedDayIdx}, ${index})">✏️</button>
+              <button class="add-btn" style="background:#e63946; padding:4px 6px;" onclick="removeScheduleTask(${selectedDayIdx}, ${index})">🗑️</button>
             </div>
           </li>`;
         });
@@ -964,28 +1014,45 @@
       renderPending();
     }
 
+    function renderScheduleTable() {
+      const tbody = document.getElementById("scheduleTableBody");
+      tbody.innerHTML = "";
+
+      // Percorre os dias de 1 a 6 e finaliza em 0 (Segunda a Domingo)
+      const weekDaysOrder = [1, 2, 3, 4, 5, 6, 0];
+
+      weekDaysOrder.forEach(day => {
+        const tasks = userSchedule[day] || [];
+        if (tasks.length === 0) {
+          tbody.innerHTML += `<tr>
+            <td><strong>${daysMap[day]}</strong></td>
+            <td>--:--</td>
+            <td style="color:#777;">Livre</td>
+          </tr>`;
+        } else {
+          tasks.forEach((t, i) => {
+            tbody.innerHTML += `<tr>
+              ${i === 0 ? `<td rowspan="${tasks.length}"><strong>${daysMap[day]}</strong></td>` : ''}
+              <td>${t.time}</td>
+              <td style="text-align:left;">${t.text}</td>
+            </tr>`;
+          });
+        }
+      });
+    }
+
     function startScheduleTask(subjectName) {
       currentStudyingSubject = subjectName;
       document.getElementById("activeSubjectLabel").textContent = `Foco: ${subjectName}`;
       startTimer();
     }
 
-    function completeScheduleTask(taskIdx) {
+    function completeScheduleTask(dayIdx, taskIdx) {
       addXP(50);
       reduceStress(10);
       damageBoss(50);
       AUDIO_SUCESSO.play();
 
-      let weekIdx = document.getElementById("selectWeek").value || 1;
-      if (activePhase === 2) weekIdx = 3;
-      if (activePhase === 3) weekIdx = 5;
-      if (activePhase === 4) weekIdx = 7;
-
-      const dayIdx = new Date().getDay();
-      if (fullScheduleData[activePhase][weekIdx][dayIdx]) {
-        fullScheduleData[activePhase][weekIdx][dayIdx].splice(taskIdx, 1);
-        renderScheduleUI();
-      }
       alert("🎉 Bloco Concluído! +50 XP!");
     }
 
@@ -1683,6 +1750,3 @@
   </script>
 </body>
 </html>
-
-
-          
